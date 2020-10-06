@@ -1,0 +1,105 @@
+{{define "content"}}
+<div class="container">
+  <span class="section-title">{{ .PageName }}</span>
+  <hr>
+  <table id="projectinfo" class="table table-striped table-hover custom-table" style="width:100%">
+    <thead class="text-white bg-custom">
+      <tr>
+        <th>Control</th>
+        <th>ID</th>
+        <th>State</th>
+        <th>Charge Rate</th>
+        <th class="d-none d-lg-table-cell">Current Watts</th>
+        <th class="d-none d-xl-table-cell">Last Comms</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .StatsData}}
+      <tr>
+        <td>{{ if .ChargeState }}
+          <form id="twcid" action="/api/v1/disable" method="post">
+            <input type="hidden" name="twcid" id="twcid" value="{{ .TWCID | BytesToString }}">
+            <button class="btn btn-sm btn-danger btn-custom-radius btn-custom-font" type="submit">Stop</button>
+          </form>
+          {{ else }}
+          <form id="twcid" action="/api/v1/enable" method="post">
+            <input type="hidden" name="twcid" id="twcid" value="{{ .TWCID | BytesToString }}">
+            <button class="btn btn-sm btn-success btn-custom-radius btn-custom-font" type="submit">Start</button>
+          </form>
+          {{ end }}
+        </td>
+        <td><a href="/info/{{ .TWCID | BytesToString }}"
+            class="btn btn-sm btn-custom-2">{{ .TWCID | BytesToString }}</a></td>
+        <td>{{ .ReportedState | GetState }}</td>
+        <td>{{ .ReportedAmpsActual | BytesToUint16Divide }}/{{ .ReportedAmpsMax | BytesToUint16Divide }}A</td>
+        <td class="d-none d-lg-table-cell">{{ .StatsCurrentWatts }} W</td>
+        <td class="d-none d-xl-table-cell">{{ .TimeLastRx | GetTime }}</td>
+      </tr>
+      {{else}}
+      <tr>
+        <td colspan="6">No Wall Connectors Found</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  <br>
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-body bg-custom-light">
+          <span class="dashboard-section-title">Set Available Amps</span>
+          <hr>
+          <form id="maxamps" action="/api/v1/maxamps" method="post">
+            <div class="form-group">
+              <label for="availableAmps">Amps</label>
+              <input type="number" class="form-control" name="availableAmps" id="availableAmps" placeholder="32"
+                value="{{ .PrimaryData.AvailableAmps }}">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-custom">Update</button>
+            </div>
+        </div>
+        </form>
+      </div>
+      <br>
+      <div class="alert alert-secondary bg-custom-light" role="alert">
+        <p>Set the available amps for all Wall Connectors</p>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-body bg-custom-light">
+          <span class="dashboard-section-title">Set Available Amps by Watts</span>
+          <hr>
+          <form id="maxwatts" action="/api/v1/maxwatts" method="post">
+            <div class="form-group">
+              <label for="availableWatts">Watts</label>
+              <input type="number" class="form-control" name="availableWatts" id="availableWatts" placeholder="2400"
+                value="">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-custom">Update</button>
+            </div>
+        </div>
+        </form>
+      </div>
+      <br>
+      <div class="alert alert-secondary bg-custom-light" role="alert">
+        <p>Set the available amps for all Wall Connectors using a given wattage<br>
+          11520Watts / (240v * 3Phase) = 16A<br>
+          3840Watts / (240v * 1Phase) = 16A</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function proceed() {
+    var form = document.createElement('form');
+    form.setAttribute('method', 'post');
+    form.setAttribute('action', '/api/v1/disable');
+    form.style.display = 'hidden';
+    document.body.appendChild(form)
+    form.submit();
+  }
+</script>
+{{end}}

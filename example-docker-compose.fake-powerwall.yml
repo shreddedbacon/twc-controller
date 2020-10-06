@@ -1,0 +1,9 @@
+version: "2"
+services:
+  twc-controller:
+    environment:
+      - POWERWALL_HOST="http://fake-powerwall:8080"
+  fake-powerwall:
+    image: shreddedbacon/fake-powerwall:arm32v6-rpi-v0.0.1
+    environment:
+      - INVERTER_HOST="http://192.168.50.1"

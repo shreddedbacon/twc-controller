@@ -1,0 +1,10 @@
+version: "2"
+services:
+  twc-controller:
+    image: shreddedbacon/twc-controller:arm32v6-rpi-v0.0.1
+    privileged: true
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config.yml:/config.yml
+      - /dev:/dev

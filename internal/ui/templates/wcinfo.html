@@ -1,0 +1,117 @@
+{{define "content"}}
+<div class="container">
+    <span class="section-title">{{ .PageName }} ID: {{ .StatsData.TWCID | BytesToString }}</span>
+    <hr>
+    <div class="card-deck">
+        <div class="card">
+            <div class="card-body bg-custom-light">
+                <span class="dashboard-section-title">Connected Vehicle</span>
+                <hr>
+                <div class="form-group">
+                    <label for="supplyVoltage">VIN</label>
+                    <input type="text" class="form-control" disabled
+                        value="{{ .StatsData.VINStart }}{{ .StatsData.VINMiddle }}{{ .StatsData.VINEnd }}">
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="card-deck">
+        <div class="card">
+            <div class="card-body bg-custom-light">
+                <span class="dashboard-section-title">Charging Info</span>
+                <hr>
+                <div class="form-group">
+                    <label for="supplyVoltage">Charge Rate</label>
+                    <input type="text" class="form-control" disabled
+                        value="{{ .StatsData.ReportedAmpsActual | BytesToUint16Divide }}/{{ .StatsData.ReportedAmpsMax | BytesToUint16Divide }}A">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Current Watts</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsCurrentWatts }} W">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Total kWH</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsKWH }} kWH">
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body bg-custom-light">
+                <span class="dashboard-section-title">State / Controls</span>
+                <hr>
+                <div class="form-group">
+                    <label for="supplyVoltage">Current State</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.ReportedState | GetState }}">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Plug State</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.PlugState }}">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Last Comms</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.TimeLastRx | GetTime }}">
+                </div>
+                <div class="right">
+                    {{ if .StatsData.ChargeState }}
+                    <form id="twcid" action="/api/v1/disable" method="post">
+                        <input type="hidden" name="twcid" id="twcid" value="{{ .StatsData.TWCID | BytesToString}}">
+                        <button class="btn btn-danger btn-custom-radius btn-custom-font" type="submit">Stop</button>
+                    </form>
+                    {{ else }}
+                    <form id="twcid" action="/api/v1/enable" method="post">
+                        <input type="hidden" name="twcid" id="twcid" value="{{ .StatsData.TWCID | BytesToString }}">
+                        <button class="btn btn-success btn-custom-radius btn-custom-font" type="submit">Start</button>
+                    </form>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="card-deck">
+        <div class="card">
+            <div class="card-body bg-custom-light">
+                <span class="dashboard-section-title">Phase 1 Stats</span>
+                <hr>
+                <div class="form-group">
+                    <label for="supplyVoltage">Voltage</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsP1Volts }}V">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Current Amps</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsP1Amps }}A">
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body bg-custom-light">
+                <span class="dashboard-section-title">Phase 2 Stats</span>
+                <hr>
+                <div class="form-group">
+                    <label for="supplyVoltage">Voltage</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsP2Volts }}V">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Current Amps</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsP2Amps }}A">
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body bg-custom-light">
+                <span class="dashboard-section-title">Phase 3 Stats</span>
+                <hr>
+                <div class="form-group">
+                    <label for="supplyVoltage">Voltage</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsP3Volts }}V">
+                </div>
+                <div class="form-group">
+                    <label for="supplyVoltage">Current Amps</label>
+                    <input type="text" class="form-control" disabled value="{{ .StatsData.StatsP3Amps }}A">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
