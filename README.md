@@ -6,7 +6,7 @@
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker-compose](https://docs.docker.com/compose/install/)
-- RaspberryPi B+ 512MB or greater
+- RaspberryPi B+ 512MB or greater (preferable RaspberryPi 3B with WIFI)
 - [USB RS485 device](https://www.ebay.com.au/itm/USB-To-RS485-Converter-Module-USB-To-TTL-RS485-Dual-Function-Dual-Protection/392923867548)
 
 ### Wiring
@@ -25,6 +25,20 @@ You may need to press and hold the reset button for a few seconds on the side of
 The preferred installation method is using docker and docker-compose.
 
 Using HypriotOS as the preferred operating system as it comes pre-bundled with docker. You can use the `flash` tool [here](https://github.com/hypriot/flash) to install the HypriotOS to an SD card to install in your RaspberryPi.
+
+### Mac / Linux users
+
+You can use flash to install hypriot with the accompanying user-data.yml onto the SD card.
+```
+cp example-user-data.yml user-data.yml
+# edit user-data.yml accordingly then flash the SD card
+flash --userdata user-data.yml \
+    https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip
+```
+
+Simply insert the SD card into the RaspberryPi and power it up, if the WiFi is configured correctly in user-data.yml, it should self install the controller after a few minutes.
+
+Once running, visit the IP address of your RaspberryPi in the browser with the configured port (default is 8080), eg: http://192.168.1.25:8080
 
 ### Clone and Config
 
