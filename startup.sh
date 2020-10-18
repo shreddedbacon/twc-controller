@@ -1,10 +1,10 @@
 #!/bin/bash
 
 usage() {
-  echo "Usage: ./startup.sh -p fakepowerwall -i http://192.168.1.50 -t fronius"
+  echo "Usage: ./startup.sh -p <nofakepowerwall|fakepowerwall> -i http://192.168.1.50 -t fronius"
   echo "WARNING: specifying -p fakepowerwall without options -i or -t will result in errors"
   echo "Options:"
-  echo "  -p fakepowerwall"
+  echo "  -p fakepowerwall|nofakepowerwall"
   echo "  -i <inverter_host>"
   echo "  -t <inverter_type>"
   exit 1
