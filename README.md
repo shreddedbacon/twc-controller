@@ -2,14 +2,14 @@
 
 > Disclaimer: Use this at your own risk, it is not fully functional and under heavy development at the moment.
 
-### Requirements
+## Requirements
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker-compose](https://docs.docker.com/compose/install/)
 - RaspberryPi B+ 512MB or greater (preferable RaspberryPi 3B with WIFI)
 - [USB RS485 device](https://www.ebay.com.au/itm/USB-To-RS485-Converter-Module-USB-To-TTL-RS485-Dual-Function-Dual-Protection/392923867548)
 
-### Wiring
+## Wiring
 
 Recommened powering your RaspberryPi from an external power source rather than directly from the Tesla Wall Connector (TWC). This allows you to perform maintenance on the TWC without having to restart the RaspberryPI. It is possible to power the RaspberryPi directly from the TWC, but it is not recommended unless you know what you're doing.
 
@@ -22,13 +22,21 @@ You may need to press and hold the reset button for a few seconds on the side of
 
 ## Installation
 
-The preferred installation method is using docker and docker-compose.
+The preferred installation method is using docker and docker-compose. But bundled with `cloud-init` that HypriotOS offers makes this simpler, see the following `Mac / Linux Users` and `Windows Users` sections on installing using HypriotOS.
 
 Using HypriotOS as the preferred operating system as it comes pre-bundled with docker. You can use the `flash` tool [here](https://github.com/hypriot/flash) to install the HypriotOS to an SD card to install in your RaspberryPi.
 
-### Mac / Linux users
+### Mac / Linux Users
 
-You can use flash to install hypriot with the accompanying user-data.yml onto the SD card.
+> Note: if you don't have a powerwall, and want to use the `fake-powerwall` service, this is not currently supported by this method of installation (it is coming)
+
+You can use `flash` tool above to install HypriotOS with the accompanying user-data.yml onto the SD card.
+
+Edit `user-data.yml` and change the following:
+
+* `YOUR_WIFI_SSID` - change this to your WiFi SSID
+* `YOUR_WIFI_PSK_PASSWORD` - change this to your WiFi Password
+
 ```
 cp example-user-data.yml user-data.yml
 # edit user-data.yml accordingly then flash the SD card
@@ -36,11 +44,34 @@ flash --userdata user-data.yml \
     https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip
 ```
 
-Simply insert the SD card into the RaspberryPi and power it up, if the WiFi is configured correctly in user-data.yml, it should self install the controller after a few minutes.
+Once done, simply insert the SD card into the RaspberryPi and power it up, if the WiFi is configured correctly in `user-data.yml` the installer script will download the required images and start the containers. This can take a few minutes to do.
 
 Once running, visit the IP address of your RaspberryPi in the browser with the configured port (default is 8080), eg: http://192.168.1.25:8080
 
-### Clone and Config
+### Windows Users
+
+> Note: if you don't have a powerwall, and want to use the `fake-powerwall` service, this is not currently supported by this method of installation (it is coming)
+
+There is a blog post here on the Hypriot [https://blog.hypriot.com/getting-started-with-docker-and-windows-on-the-raspberry-pi/](https://blog.hypriot.com/getting-started-with-docker-and-windows-on-the-raspberry-pi/) that explains how to flash the image to your SD card.
+
+* Download the Hypriot Docker SD card image
+* Flash the downloaded image to your SD card
+
+Once the image is flashed, load the SD card in your computer and copy the contents of `example-user-data.yml` into the existing `user-data` file in the `HypriotOS` partition.
+
+Change the following in the `user-data` file:
+
+* `YOUR_WIFI_SSID` - change this to your WiFi SSID
+* `YOUR_WIFI_PSK_PASSWORD` - change this to your WiFi Password
+
+Once done, simply insert the SD card into the RaspberryPi and power it up, if the WiFi is configured correctly in `user-data` the installer script will download the required images and start the containers. This can take a few minutes to do.
+
+Once running, visit the IP address of your RaspberryPi in the browser with the configured port (default is 8080), eg: http://192.168.1.25:8080
+
+
+### Advanced Users
+
+#### Clone and Config
 
 First step is to clone the repository and then edit the initial configuration for your setup.
 
@@ -55,7 +86,7 @@ cp example-config.yml config.yml
 You may need to edit `config.yml` to change the serial port device path, this depends on your setup.
 If you're using a USB RS-485 serial adapter on a RasperryPi, it will typically be `/dev/ttyUSB0` and should not need adjusting.
 
-### Configuring With Powerwall
+#### Configuring With Powerwall
 
 Once you have set up the `config.yml` file to point to your local IP for the powerwall (under `powerwall: x` in config.yml), you can run the controller.
 
@@ -67,7 +98,7 @@ docker-compose up -d
 
 Once running, visit the IP address of your RaspberryPi in the browser with the configured port, eg: http://192.168.1.25:8080
 
-### Configuring With No Powerwall
+#### Configuring With No Powerwall
 
 If you don't have a powerwall, but you do have a solar system, you can still use this controller as long as your inverter is supported.
 
@@ -86,7 +117,7 @@ Then edit `docker-compose.fake-powerwall.yml` and change `INVERTER_HOST` to the 
 docker-compose -f docker-compose.yml -f docker-compose.fake-powerwall.yml up -d
 ```
 
-### Configuring With No Powerwall/Solar
+#### Configuring With No Powerwall/Solar
 
 If you have no powerwall, or solar, you can still use the controller.
 
@@ -128,3 +159,17 @@ docker build -t shreddedbacon/twc-controller:arm32v6-rpi-${VERSION} .
 ```
 ./controller
 ```
+
+
+## Troubleshooting
+
+### RaspberryPI Boot up seems stuck
+
+Sometimes the first boot of the controller fails and even after 10 minutes the controller UI is not available, or the RaspberryPi is not reachable on the network
+
+This could be related to two things:
+
+* Incorrect WiFi SSID/Password
+  * Check you've got the correct WiFi settings configured.
+* First boot failed
+  * If the first boot failed (it happens :() then try restarting the RaspberryPi (power cycle it) and see if it starts up. Sometimes cloud-init in HypriotOS doesn't run properly and a restart seems to fix it.
