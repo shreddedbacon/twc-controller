@@ -9,7 +9,7 @@ serial:
   baudRate: 9600
 availableAmps: 6
 powerwall: http://192.168.1.50
-enablePowerwall: false
+enablePowerwall: true
 autoStartStopInterval: true
 powerOffset: 0
-powerwallCheckInterval: 1
+powerwallCheckInterval: 5
