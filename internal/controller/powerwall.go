@@ -27,7 +27,20 @@ func (p *TWCPrimary) GetPowerwallSettings(w http.ResponseWriter, r *http.Request
 	tpl := append(tpl1, tpl2...)
 	tpl = append(tpl, tpl3...)
 	tmpl, _ := template.New("").Funcs(funcMap).Parse(string(tpl))
-	d := &powerwall.MetersAggregates{}
+	d := &powerwall.MetersAggregates{
+		Site: &powerwall.AggregateData{
+			InstantPower: 0,
+		},
+		Load: &powerwall.AggregateData{
+			InstantPower: 0,
+		},
+		Solar: &powerwall.AggregateData{
+			InstantPower: 0,
+		},
+		Battery: &powerwall.AggregateData{
+			InstantPower: 0,
+		},
+	}
 	if p.EnablePowerwall && p.Powerwall != "" {
 		pw := powerwall.FakePowerwall{
 			Inverter: p.Powerwall,
