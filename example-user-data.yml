@@ -8,12 +8,12 @@ manage_etc_hosts: true
 
 # You could modify this for your own user information
 users:
-  - name: pirate
-    gecos: "Hypriot Pirate"
+  - name: tesla
+    gecos: "Tesla Wall Connector Controller"
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker,video,input
-    plain_text_passwd: hypriot
+    plain_text_passwd: tesla
     lock_passwd: false
     ssh_pwauth: true
     chpasswd: { expire: false }
@@ -49,14 +49,59 @@ write_files:
       ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
       update_config=1
       network={
-      ssid="YOUR_WIFI_SSID"
-      psk="YOUR_WIFI_PSK_PASSWORD"
-      proto=RSN
-      key_mgmt=WPA-PSK
-      pairwise=CCMP
-      auth_alg=OPEN
+        ssid="YOUR_WIFI_SSID"
+        psk="YOUR_WIFI_PSK_PASSWORD"
+        proto=RSN
+        key_mgmt=WPA-PSK
+        pairwise=CCMP
+        auth_alg=OPEN
       }
     path: /etc/wpa_supplicant/wpa_supplicant.conf
+  - content: |
+      #!/bin/bash
+      sudo -i -u tesla bash << "EOF"
+      function twcstartup {
+      if [ ! -d /home/tesla/twc-controller ]
+      then
+          DOCKER_RUN=false
+          until "$DOCKER_RUN" == "true"
+          do
+              if [ "$(systemctl is-active docker)" = "active" ]; then
+              DOCKER_RUN=true
+              echo "Docker is running, continuing..."
+              GIT_SSL_NO_VERIFY=true git clone https://github.com/shreddedbacon/twc-controller.git /home/tesla/twc-controller
+              fi
+          done
+      fi
+      DOCKER_RUN=false
+      until "$DOCKER_RUN" == "true"
+      do
+          if [ "$(systemctl is-active docker)" = "active" ]; then
+              DOCKER_RUN=true
+              echo "Docker is running, continuing..."
+              cd /home/tesla/twc-controller
+              bash startup.sh
+              #bash startup.sh fakepowerwall
+          fi
+      done
+      }
+      exitcount=0
+      while true
+      do
+        if [ $exitcount -eq 30 ]; then
+            echo "Failed to start up the TWC controllers after 30 attempts"
+            break
+        fi
+        twcstartup
+        if [ $? -eq 0 ]; then
+            break
+        fi
+        ((exitcount=exitcount+1))
+        sleep 5
+      done
+      EOF
+    path: /twccontroller
+    permissions: "0755"
 
 # These commands will be ran once on first boot only
 runcmd:
@@ -64,23 +109,5 @@ runcmd:
   - "systemctl restart avahi-daemon"
   # Activate WiFi interface
   - "ifup wlan0"
-  # Install portainer
-  - [
-      docker,
-      service,
-      create,
-      "--detach=false",
-      "--name",
-      "portainer",
-      "--publish",
-      "9000:9000",
-      "--mount",
-      "type=volume,src=portainer_data,dst=/data",
-      "--mount",
-      "type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock",
-      "portainer/portainer",
-      "-H",
-      "unix:///var/run/docker.sock",
-      "--no-auth",
-    ]
-  - "git clone https://github.com/shreddedbacon/twc-controller.git && cd twc-controller && bash startup.sh"
+  # setup the startup/install scripts
+  - "/twccontroller"
