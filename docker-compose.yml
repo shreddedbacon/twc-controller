@@ -1,7 +1,7 @@
 version: "2"
 services:
   twc-controller:
-    image: shreddedbacon/twc-controller:arm32v6-rpi-v0.0.2
+    image: shreddedbacon/twc-controller:arm32v6-rpi-v0.0.3
     privileged: true
     restart: always
     ports:
@@ -13,19 +13,19 @@ services:
       driver: "json-file"
       options:
         max-size: "10m"
-  portainer:
-    image: portainer/portainer-ce
-    restart: always
-    ports:
-      - 9000:9000
-    command: -H unix:///var/run/docker.sock
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
+  # portainer:
+  #   image: portainer/portainer-ce
+  #   restart: always
+  #   ports:
+  #     - 9000:9000
+  #   command: -H unix:///var/run/docker.sock
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
   shellinabox:
     image: fhuegli/rpi-shellinabox
     restart: always
