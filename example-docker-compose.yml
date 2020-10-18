@@ -13,11 +13,6 @@ services:
       driver: "json-file"
       options:
         max-size: "10m"
-    environment:
-      POWERWALL_HOST: http://fake-powerwall:8080
-  fake-powerwall:
-    image: shreddedbacon/fake-powerwall:arm32v6-rpi-v0.0.2
-    env_file: .env.fakepowerwall
   shellinabox:
     image: fhuegli/rpi-shellinabox
     restart: always
