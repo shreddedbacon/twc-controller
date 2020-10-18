@@ -80,6 +80,9 @@ write_files:
               DOCKER_RUN=true
               echo "Docker is running, continuing..."
               cd /home/tesla/twc-controller
+              ## if using fakepowerwall, change the INVERTER_HOST value to the address for your inverter (see fake-powerwall for information)
+              INVERTER_HOST=http://192.168.1.50
+              INVERTER_TYPE=fronius
               bash startup.sh
               #bash startup.sh fakepowerwall
           fi
