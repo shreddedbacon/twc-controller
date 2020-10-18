@@ -1,3 +1,11 @@
+# ignore the config file that is created as this can be customized by users
 config.yml
-docker-compose.fake-powerwall.yml
+
+# ignore user-data.yml also as this can be customized by users
 user-data.yml
+
+# ignore docker-compose as this is also something that can be copied from examples and modified by the user
+docker-compose.yml
+
+# this is used by the fake-powerwall to determine, startup.sh creates this
+.env.fakepowerwall
