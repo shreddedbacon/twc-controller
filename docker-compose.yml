@@ -9,6 +9,10 @@ services:
     volumes:
       - ./config.yml:/config.yml
       - /dev:/dev
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
   portainer:
     image: portainer/portainer-ce
     restart: always
@@ -21,13 +25,12 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-file: 5
-        max-size: 10m
+        max-size: "10m"
   shellinabox:
-    image: shreddedbacon/rpi-shellinabox
+    image: fhuegli/rpi-shellinabox
     restart: always
     ports:
-      - 2222:4200
+      - 4200:4200
     environment:
       - SIAB_SSL=false
       - SIAB_ADDUSER=false
@@ -35,8 +38,7 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-file: 5
-        max-size: 10m
+        max-size: "10m"
 
 volumes:
   portainer_data:
