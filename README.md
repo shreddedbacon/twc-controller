@@ -68,6 +68,65 @@ Once done, simply insert the SD card into the RaspberryPi and power it up, if th
 
 Once running, visit the IP address of your RaspberryPi in the browser with the configured port (default is 8080), eg: http://192.168.1.25:8080
 
+## Usage
+
+### Main Page
+
+The main page is where all the connected TWCs are listed, and also allows for setting the available amps directly.
+
+Clicking on the ID button of a connected TWC will load the info page for that TWC
+
+[main page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/home.png)
+
+### TWC Info Page
+
+This page lists the information being provided from the TWC itself.
+
+This info includes things like:
+* Connected vehicles VIN
+* Plug state
+* Charging state
+* Current usage
+* Each electrical phase and its usage
+
+[twc info page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/twcinfo.png)
+
+### Powerwall Page
+
+The powerwall page is where you can configure the TWC to utilise Solar power to adjust the amperage that the car sees.
+
+This allows you to charge down to 6A in 3Phase or 1Phase setups, all the way up to 16A(3Phase) or 32A(1Phase), as long as your solar system is capable of it.
+
+Setting `Enable Powerwall Monitoring` to true will tell the controller to talk to the powerwall defined in the configuration. 
+
+> If you don't have a powerwall, there is the[fake-powerwall](https://github.com/shreddedbacon/fake-powerwall) project that provides a powerwall like api for some solar inverters
+
+[powerwall page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/powerwall.png)
+
+### Accounts Page
+
+A problem that occurs with using the TWC in this way is that there is no smooth way to stop the car from charging, so we use the Tesla API to do that. Without entering any credentials, when the controller tells a TWC to stop charging, the car will get into a funky state that requires you to go and unplug, then re-plug the car in for it it start charging again.
+
+Recommend creating a secondary account in the Tesla account portal, and using that account to sign in to the TWC controller, the credentials aren't stored by the controller, so if you restart you will need to sign in again in the future, the credentias also do not automatically renew, so make sure you make note of the expiration date so you can log in again later on.
+
+No other functions are performed against the Tesla API except for waking the car up to tell the car to stop or start charging.
+
+[accounts page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/accounts.png)
+
+### Settings Page
+
+Settings page is where you can set the minimum and maximum amperages to to provide to the TWC(s), and also to configure the voltage and phases values that are used to calculate watts and amps to charge with.
+
+[settings page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/settings.png)
+
+### SSH Access
+
+Bundled with the controller is a web based SSH service called shellinabox, you can access this on port 4200, eg: http://192.168.1.25:4200
+
+The default credentials for SSH access are:
+
+* Username: tesla
+* Password: tesla
 
 ### Advanced Users
 
