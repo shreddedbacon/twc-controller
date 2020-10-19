@@ -37,6 +37,8 @@ Edit `user-data.yml` and change the following:
 * `YOUR_WIFI_SSID` - change this to your WiFi SSID
 * `YOUR_WIFI_PSK_PASSWORD` - change this to your WiFi Password
 
+The default user that gets created in the operating system is `tesla` with the password `tesla`, you can change this by editing `plain_text_passwd` in the `user-data.yml` file to the password you want to use.
+
 ```
 cp example-user-data.yml user-data.yml
 # edit user-data.yml accordingly then flash the SD card
@@ -63,6 +65,8 @@ Change the following in the `user-data` file:
 
 * `YOUR_WIFI_SSID` - change this to your WiFi SSID
 * `YOUR_WIFI_PSK_PASSWORD` - change this to your WiFi Password
+
+The default user that gets created in the operating system is `tesla` with the password `tesla`, you can change this by editing `plain_text_passwd` in the `user-data` file to the password you want to use.
 
 Once done, simply insert the SD card into the RaspberryPi and power it up, if the WiFi is configured correctly in `user-data` the installer script will download the required images and start the containers. This can take a few minutes to do.
 
