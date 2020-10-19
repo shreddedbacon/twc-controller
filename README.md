@@ -76,7 +76,7 @@ The main page is where all the connected TWCs are listed, and also allows for se
 
 Clicking on the ID button of a connected TWC will load the info page for that TWC
 
-![main page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/home.png)
+![main page](https://github.com/shreddedbacon/twc-controller/blob/main/docs/screenshots/home.png)
 
 ### TWC Info Page
 
@@ -89,7 +89,7 @@ This info includes things like:
 * Current usage
 * Each electrical phase and its usage
 
-![twc info page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/twcinfo.png)
+![twc info page](https://github.com/shreddedbacon/twc-controller/blob/main/docs/screenshots/twcinfo.png)
 
 ### Powerwall Page
 
@@ -101,7 +101,7 @@ Setting `Enable Powerwall Monitoring` to true will tell the controller to talk t
 
 > If you don't have a powerwall, there is the[fake-powerwall](https://github.com/shreddedbacon/fake-powerwall) project that provides a powerwall like api for some solar inverters
 
-![powerwall page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/powerwall.png)
+![powerwall page](https://github.com/shreddedbacon/twc-controller/blob/main/docs/screenshots/powerwall.png)
 
 ### Accounts Page
 
@@ -111,13 +111,13 @@ Recommend creating a secondary account in the Tesla account portal, and using th
 
 No other functions are performed against the Tesla API except for waking the car up to tell the car to stop or start charging.
 
-![accounts page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/accounts.png)
+![accounts page](https://github.com/shreddedbacon/twc-controller/blob/main/docs/screenshots/accounts.png)
 
 ### Settings Page
 
 Settings page is where you can set the minimum and maximum amperages to to provide to the TWC(s), and also to configure the voltage and phases values that are used to calculate watts and amps to charge with.
 
-![settings page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/settings.png)
+![settings page](https://github.com/shreddedbacon/twc-controller/blob/main/docs/screenshots/settings.png)
 
 ### SSH Access
 
