@@ -89,7 +89,7 @@ This info includes things like:
 * Current usage
 * Each electrical phase and its usage
 
-~[twc info page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/twcinfo.png)
+![twc info page](https://github.com/shreddedbacon/twc-controller/blob/master/docs/screenshots/twcinfo.png)
 
 ### Powerwall Page
 
