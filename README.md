@@ -11,7 +11,7 @@
 
 ## Wiring
 
-Recommened powering your RaspberryPi from an external power source rather than directly from the Tesla Wall Connector (TWC). This allows you to perform maintenance on the TWC without having to restart the RaspberryPI. It is possible to power the RaspberryPi directly from the TWC, but it is not recommended unless you know what you're doing.
+Recommened powering your RaspberryPi from an external power source rather than directly from the Tesla Wall Connector (TWC). This allows you to perform maintenance on the TWC without having to restart the RaspberryPi. It is possible to power the RaspberryPi directly from the TWC, but it is not recommended unless you know what you're doing.
 
 Before wiring up the USB RS485 into the TWC, make sure the TWC is powered off.
 The wiring into the TWC is pretty straight forward, you need to connect D+ on the USB device to D+ on the TWC, same for D- to D-.
@@ -32,16 +32,19 @@ Using HypriotOS as the preferred operating system as it comes pre-bundled with d
 
 You can use `flash` tool above to install HypriotOS with the accompanying user-data.yml onto the SD card.
 
+```
+# first copy the example-user-data.yml file
+cp example-user-data.yml user-data.yml
+```
+
 Edit `user-data.yml` and change the following:
 
 * `YOUR_WIFI_SSID` - change this to your WiFi SSID
 * `YOUR_WIFI_PSK_PASSWORD` - change this to your WiFi Password
 
-The default user that gets created in the operating system is `tesla` with the password `tesla`, you can change this by editing `plain_text_passwd` in the `user-data.yml` file to the password you want to use.
+The default user that gets created in the operating system is `tesla` with the password `tesla`, you can change this by editing the `plain_text_passwd` in the `user-data.yml` file to the password you want to use.
 
 ```
-cp example-user-data.yml user-data.yml
-# edit user-data.yml accordingly then flash the SD card
 flash --userdata user-data.yml \
     https://github.com/hypriot/image-builder-rpi/releases/download/v1.12.0/hypriotos-rpi-v1.12.0.img.zip
 ```
@@ -59,14 +62,14 @@ There is a blog post here on the Hypriot [https://blog.hypriot.com/getting-start
 * Download the Hypriot Docker SD card image
 * Flash the downloaded image to your SD card
 
-Once the image is flashed, load the SD card in your computer and copy the contents of `example-user-data.yml` into the existing `user-data` file in the `HypriotOS` partition.
+Once the image is flashed, load the SD card in your computer and copy the contents of `example-user-data.yml` and overwrite the entire contents of the `user-data` file in the `HypriotOS` partition.
 
 Change the following in the `user-data` file:
 
 * `YOUR_WIFI_SSID` - change this to your WiFi SSID
 * `YOUR_WIFI_PSK_PASSWORD` - change this to your WiFi Password
 
-The default user that gets created in the operating system is `tesla` with the password `tesla`, you can change this by editing `plain_text_passwd` in the `user-data` file to the password you want to use.
+The default user that gets created in the operating system is `tesla` with the password `tesla`, you can change this by editing the `plain_text_passwd` in the `user-data` file to the password you want to use.
 
 Once done, simply insert the SD card into the RaspberryPi and power it up, if the WiFi is configured correctly in `user-data` the installer script will download the required images and start the containers. This can take a few minutes to do.
 
