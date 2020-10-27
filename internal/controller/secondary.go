@@ -64,6 +64,7 @@ func NewTWCSecondary(newSecondaryID []byte, maxAmps int, port *serial.Port, wiri
 		MinAmpsTWCSupports: 6,
 		DebugLevel:         debugLevel,
 		wiringMaxAmps:      wiringMaxAmpsPerTWC,
+		AvailableAmps:      []byte{0x00, 0x00},
 		LastAmpsOffered:    []byte{0x00, 0x00},
 		ReportedAmpsActual: []byte{0x00, 0x00},
 		ReportedAmpsMax:    []byte{0x00, 0x00},
