@@ -435,7 +435,8 @@ func (p *TWCPrimary) SetMaxAmpsHandler(intAmps int) error {
 	if p.knownTWCs != nil {
 		splitAmps := totalAmps / len(p.knownTWCs)
 		for _, twc := range p.knownTWCs {
-			//@TODO: also set the heartbeat data to contain this value?
+			// set the twc to have the number of amps available to it to use in the heartbeat
+			twc.AvailableAmps = Dec2Bytes(uint16(splitAmps))
 			if twc.AllowCharge {
 				_, err := p.sendChargeRate(twc.TWCID, Dec2Bytes(uint16(splitAmps)), byte(0x09))
 				if err != nil {

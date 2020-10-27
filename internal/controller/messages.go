@@ -57,7 +57,6 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 			log.Println(fmt.Sprintf("PRIMARY: !! DANGER!!: wiringMaxAmpsPerTWC is %d which is greater than the max %d amps your charger says it can handle.", secondaryTWC.wiringMaxAmps, maxAmps))
 			secondaryTWC.wiringMaxAmps = int(Bytes2Dec2(maxAmps, false)/100) / 4
 		}
-		secondaryTWC.lastHeartbeatDebugOutput = ""
 		secondaryTWC.TimeLastRx = time.Now().UTC().Unix()
 		if !secondaryTWC.AllowCharge {
 			// If the TWC has been told to stop charging, set the reported state to something that the TWC would probably

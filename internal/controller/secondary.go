@@ -27,10 +27,8 @@ type TWCSecondary struct {
 	reportedAmpsActualSignificantChangeMonitor []byte
 	timeReportedAmpsActualChangedSignificantly int64
 
-	timeLastAmpsOfferedChanged   int64
-	lastHeartbeatDebugOutput     string
-	timeLastHeartbeatDebugOutput int64
-	wiringMaxAmps                int // wiringMaxAmpsPerTWC
+	wiringMaxAmps int    // wiringMaxAmpsPerTWC
+	AvailableAmps []byte // the number of amps available to this twc
 
 	// reported* vars below are reported to us in heartbeat messages from a Secondary
 	// TWC.
@@ -124,7 +122,16 @@ func (t *TWCSecondary) sendPrimaryHeartbeat(port *serial.Port, primaryID []byte)
 		if t.DebugLevel >= 9 {
 			log.Println(fmt.Sprintf("SECONDARY: Send Primary heartbeat to this Secondary TWC %x", t.TWCID))
 		}
-		msg := append(append(append([]byte{0xFB, 0xE0}, primaryID...), t.TWCID...), t.primaryHeartbeatData...)
+		// msg := append(append(append([]byte{0xFB, 0xE0}, primaryID...), t.TWCID...), t.primaryHeartbeatData...)
+		// send heartbeat with the available amperage to this twc
+		msg := append(
+			append(
+				append(
+					[]byte{0xFB, 0xE0},
+					primaryID...),
+				t.TWCID...),
+			[]byte{0x00, t.AvailableAmps[1], t.AvailableAmps[0]}...)
+		padBytes(&msg)
 		return SendMessage(t.DebugLevel, port, msg)
 	}
 	return time.Now().UTC().Unix(), nil
