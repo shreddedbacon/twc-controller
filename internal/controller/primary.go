@@ -286,7 +286,7 @@ func (p *TWCPrimary) Run() {
 					if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
 						idxSecondaryToSendNextHeartbeat = 0
 					}
-					time.Sleep(100 * time.Millisecond)
+					time.Sleep(150 * time.Millisecond)
 				}
 			}
 		}
