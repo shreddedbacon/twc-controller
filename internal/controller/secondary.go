@@ -131,7 +131,7 @@ func (t *TWCSecondary) sendPrimaryHeartbeat(port *serial.Port, primaryID []byte)
 					[]byte{0xFB, 0xE0},
 					primaryID...),
 				t.TWCID...),
-			[]byte{0x00, t.AvailableAmps[1], t.AvailableAmps[0]}...)
+			[]byte{0x05, t.AvailableAmps[1], t.AvailableAmps[0]}...)
 		padBytes(&msg)
 		return SendMessage(t.DebugLevel, port, msg)
 	}
