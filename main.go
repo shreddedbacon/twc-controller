@@ -60,8 +60,8 @@ func main() {
 	go p.Run()
 
 	c := cron.New()
-	// Add the cron runner, every 5 seconds
-	c.AddFunc("*/5 * * * * *", func() {
+	// Add the cron runner, every second
+	c.AddFunc("* * * * * *", func() {
 		p.RunCron()
 	})
 	// start crons.

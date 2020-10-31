@@ -12,9 +12,45 @@ import (
 // RunCron runs the cron scrips
 func (p *TWCPrimary) RunCron() {
 	now := time.Now().UTC().Unix()
+	p.heartbeatCron(now)
 	p.pollCron(now)
 	p.pollSecondaryKWHCron(now)
 	p.powerwallCron(now)
+}
+
+func (p *TWCPrimary) heartbeatCron(now int64) {
+	// once linkready is done, do the heartbeat checks
+	if p.numInitMsgsToSend == 0 {
+		for _, twc := range p.knownTWCs {
+			fmt.Println(twc)
+			if (now - twc.TimeLastRx) >= 26 {
+				if p.DebugLevel >= 12 {
+					log.Println(log2JSONString(LogData{
+						Type:     "INFO",
+						Source:   "primary",
+						Sender:   fmt.Sprintf("%x", p.ID),
+						Receiver: fmt.Sprintf("%x", twc.TWCID),
+						Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+					}))
+				}
+				idx, ok := p.HasTWC(twc.TWCID)
+				if ok {
+					p.RemoveSecondary(idx)
+				}
+			} else {
+				if p.DebugLevel >= 12 {
+					log.Println(log2JSONString(LogData{
+						Type:     "INFO",
+						Source:   "primary",
+						Sender:   fmt.Sprintf("%x", p.ID),
+						Receiver: fmt.Sprintf("%x", twc.TWCID),
+						Message:  "Sending heartbeat to secondary TWC",
+					}))
+				}
+				p.timeLastTx, _ = twc.sendPrimaryHeartbeat(p.port, p.ID)
+			}
+		}
+	}
 }
 
 func (p *TWCPrimary) pollCron(now int64) {
