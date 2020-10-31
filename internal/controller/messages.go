@@ -20,7 +20,13 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 		data, _ := hex.DecodeString(matches[0][3])
 		maxAmps := []byte{data[0], data[1]}
 		if p.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("PRIMARY: %dA Secondary TWC %x%x ready to link. Sign: %x", Bytes2Dec2(maxAmps, false)/100, secondaryID[0], secondaryID[1], sign))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message:  fmt.Sprintf("Secondary TWC is ready to link, signed %x", sign),
+			}))
 		}
 		spikeAmpsToCancel6ALimitB := []byte{}
 		if Bytes2Dec2(maxAmps, false) >= 8000 {
@@ -50,11 +56,23 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 				secondaryTWC.MinAmpsTWCSupports = 6
 			}
 			if p.DebugLevel >= 9 {
-				log.Println(fmt.Sprintf("PRIMARY: Set secondary TWC %x%x protocolVersion to %d, minAmpsTWCSupports to %d", secondaryID[0], secondaryID[1], secondaryTWC.ProtocolVersion, secondaryTWC.MinAmpsTWCSupports))
+				log.Println(log2JSONString(LogData{
+					Type:     "INFO",
+					Source:   "messaging",
+					Sender:   fmt.Sprintf("%x", secondaryID),
+					Receiver: fmt.Sprintf("%x", p.ID),
+					Message:  fmt.Sprintf("Secondary TWC protocolVersion to %d, minAmpsTWCSupports to %d", secondaryTWC.ProtocolVersion, secondaryTWC.MinAmpsTWCSupports),
+				}))
 			}
 		}
 		if secondaryTWC.wiringMaxAmps > int(Bytes2Dec2(maxAmps, false)/100) {
-			log.Println(fmt.Sprintf("PRIMARY: !! DANGER!!: wiringMaxAmpsPerTWC is %d which is greater than the max %d amps your charger says it can handle.", secondaryTWC.wiringMaxAmps, maxAmps))
+			log.Println(log2JSONString(LogData{
+				Type:     "DANGER",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message:  fmt.Sprintf("DANGER!!: wiringMaxAmpsPerTWC is %d which is greater than the max %d amps your charger says it can handle.", secondaryTWC.wiringMaxAmps, maxAmps),
+			}))
 			secondaryTWC.wiringMaxAmps = int(Bytes2Dec2(maxAmps, false)/100) / 4
 		}
 		secondaryTWC.TimeLastRx = time.Now().UTC().Unix()
@@ -62,7 +80,13 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 			// If the TWC has been told to stop charging, set the reported state to something that the TWC would probably
 			// never send, so we know.
 			if p.DebugLevel >= 9 {
-				log.Println(fmt.Sprintf("PRIMARY: Secondary TWC %x%x has been disabled, setting state and charge rates to 0", secondaryID[0], secondaryID[1]))
+				log.Println(log2JSONString(LogData{
+					Type:     "INFO",
+					Source:   "messaging",
+					Sender:   fmt.Sprintf("%x", secondaryID),
+					Receiver: fmt.Sprintf("%x", p.ID),
+					Message:  "Secondary TWC has been disabled, setting state and charge rates to 0",
+				}))
 			}
 			secondaryTWC.ReportedState = byte(99)
 			secondaryTWC.ReportedAmpsActual = []byte{0x00, 0x00}
@@ -95,7 +119,13 @@ func (p *TWCPrimary) receiveSecondaryHeartbeatData(msg []byte, foundMsgMatch *bo
 				}
 			} else {
 				if p.DebugLevel >= 9 {
-					log.Println(fmt.Sprintf("PRIMARY: ERR: Received heartbeat message from secondary %x%x that we've not met before", secondaryID[0], secondaryID[1]))
+					log.Println(log2JSONString(LogData{
+						Type:     "INFO",
+						Source:   "messaging",
+						Sender:   fmt.Sprintf("%x", secondaryID),
+						Receiver: fmt.Sprintf("%x", p.ID),
+						Message:  "Received heartbeat message from secondary TWC that we've not met before",
+					}))
 				}
 			}
 		}
@@ -110,7 +140,13 @@ func (p *TWCPrimary) receiveVinStart(msg []byte, foundMsgMatch *bool) {
 		secondaryID, _ := hex.DecodeString(matches[0][1])
 		vinStart, _ := hex.DecodeString(matches[0][2])
 		if p.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("PRIMARY: Received from secondary %x: VIN Start %x", secondaryID, vinStart))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message:  fmt.Sprintf("Received from VIN Start %x from secondary TWC", vinStart),
+			}))
 		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {
@@ -131,7 +167,13 @@ func (p *TWCPrimary) receiveVinMiddle(msg []byte, foundMsgMatch *bool) {
 		secondaryID, _ := hex.DecodeString(matches[0][1])
 		vinMiddle, _ := hex.DecodeString(matches[0][2])
 		if p.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("PRIMARY: Received from secondary %x: VIN Middle %x", secondaryID, vinMiddle))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message:  fmt.Sprintf("Received from VIN Middle %x from secondary TWC", vinMiddle),
+			}))
 		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {
@@ -152,7 +194,13 @@ func (p *TWCPrimary) receiveVinEnd(msg []byte, foundMsgMatch *bool) {
 		secondaryID, _ := hex.DecodeString(matches[0][1])
 		vinEnd, _ := hex.DecodeString(matches[0][2])
 		if p.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("PRIMARY: Received from secondary %x: VIN End %x", secondaryID, vinEnd))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message:  fmt.Sprintf("Received from VIN End %x from secondary TWC", vinEnd),
+			}))
 		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {
@@ -174,7 +222,13 @@ func (p *TWCPrimary) receivePlugState(msg []byte, foundMsgMatch *bool) {
 		secondaryID, _ := hex.DecodeString(matches[0][1])
 		plugState, _ := hex.DecodeString(matches[0][2])
 		if p.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("PRIMARY: Received from secondary %x: Plug state %d", secondaryID, plugState))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message:  fmt.Sprintf("Received from Plug state %x from secondary TWC", plugState),
+			}))
 		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {
@@ -209,17 +263,21 @@ func (p *TWCPrimary) receivePeriodicPollData(msg []byte, foundMsgMatch *bool) {
 		p3amps, _ := hex.DecodeString(matches[0][8])
 
 		if p.DebugLevel >= 12 {
-			log.Println(fmt.Sprintf("PRIMARY: Secondary TWC %x%x unexpectedly reported kWh and voltage data: %d %d %d %d %d %d %d",
-				secondaryID[0],
-				secondaryID[1],
-				Bytes2Dec4(data, false),
-				Bytes2Dec2(p1, false),
-				Bytes2Dec2(p2, false),
-				Bytes2Dec2(p3, false),
-				int(p1amps[0])/2,
-				int(p2amps[0])/2,
-				int(p3amps[0])/2,
-			))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "messaging",
+				Sender:   fmt.Sprintf("%x", secondaryID),
+				Receiver: fmt.Sprintf("%x", p.ID),
+				Message: fmt.Sprintf(" Secondary TWC unexpectedly reported kWh and voltage data: %d %d %d %d %d %d %d",
+					Bytes2Dec4(data, false),
+					Bytes2Dec2(p1, false),
+					Bytes2Dec2(p2, false),
+					Bytes2Dec2(p3, false),
+					int(p1amps[0])/2,
+					int(p2amps[0])/2,
+					int(p3amps[0])/2,
+				),
+			}))
 		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {
@@ -255,6 +313,10 @@ func (p *TWCPrimary) isPrimaryTWC(msg []byte, foundMsgMatch *bool) {
 	// matches := regexp.MustCompile(`\Afc(e1|e2)(....)(..)0000000000000000.+.+$`).FindAllStringSubmatch(fmt.Sprintf("%x", msg), -1)
 	if msgMatch && *foundMsgMatch == false {
 		*foundMsgMatch = true
-		log.Println(fmt.Sprintf("PRIMARY: ERR: TWC is set to Primary mode so it can't be controlled"))
+		log.Println(log2JSONString(LogData{
+			Type:    "ERROR",
+			Source:  "messaging",
+			Message: "ERR: TWC is set to Primary mode so it can't be controlled",
+		}))
 	}
 }

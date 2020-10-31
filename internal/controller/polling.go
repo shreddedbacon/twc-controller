@@ -1,14 +1,20 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"time"
 )
 
 // PollSecondaryKWH polls the secondary TWCs for their usage statistics
 func (p *TWCPrimary) PollSecondaryKWH() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll Secondary for stats")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll secondary for stats",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0xEB}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -21,8 +27,13 @@ func (p *TWCPrimary) PollSecondaryKWH() (int64, error) {
 
 // PollFirmwareVersion polls the secondary TWCs for their usage statistics
 func (p *TWCPrimary) PollFirmwareVersion() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll firmware version")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll for firmware version",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0x1B}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -35,8 +46,13 @@ func (p *TWCPrimary) PollFirmwareVersion() (int64, error) {
 
 // PollSerialNumber polls the secondary TWCs for their usage statistics
 func (p *TWCPrimary) PollSerialNumber() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll serial number")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll for serial number",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0x19}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -49,8 +65,13 @@ func (p *TWCPrimary) PollSerialNumber() (int64, error) {
 
 // PollModel polls the secondary TWCs for their usage statistics
 func (p *TWCPrimary) PollModel() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll model")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll model number",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0x1A}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -63,8 +84,13 @@ func (p *TWCPrimary) PollModel() (int64, error) {
 
 // PollVINStart polls the secondary TWCs for the current VIN
 func (p *TWCPrimary) PollVINStart() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll Secondary for VIN start")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll Secondary for VIN start",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0xEE}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -77,8 +103,13 @@ func (p *TWCPrimary) PollVINStart() (int64, error) {
 
 // PollVINMiddle polls the secondary TWCs for the current VIN
 func (p *TWCPrimary) PollVINMiddle() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll Secondary for VIN middle")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll Secondary for VIN middle",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0xEF}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -91,8 +122,13 @@ func (p *TWCPrimary) PollVINMiddle() (int64, error) {
 
 // PollVINEnd polls the secondary TWCs for the current VIN
 func (p *TWCPrimary) PollVINEnd() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll Secondary for VIN end")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll Secondary for VIN end",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0xF1}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)
@@ -105,8 +141,13 @@ func (p *TWCPrimary) PollVINEnd() (int64, error) {
 
 // PollPlugState polls the secondary TWCs for their plug state
 func (p *TWCPrimary) PollPlugState() (int64, error) {
-	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Poll Secondary for plug state")
+	if p.DebugLevel >= 15 {
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "polling",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Poll Secondary for plug state",
+		}))
 	}
 	for _, twc := range p.knownTWCs {
 		// msg := append(append(append([]byte{0xFB, 0xB4}, p.ID...), twc.TWCID...), []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}...)

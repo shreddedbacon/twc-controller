@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -185,4 +186,9 @@ func float64frombytes(bytes []byte) float64 {
 func httpError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusBadRequest)
 	fmt.Fprintf(w, "%s", fmt.Sprintf(`{"error":"%v"}`, err))
+}
+
+func log2JSONString(log LogData) string {
+	b, _ := json.Marshal(log)
+	return string(b)
 }

@@ -20,7 +20,10 @@ func (p *TWCPrimary) RunCron() {
 func (p *TWCPrimary) pollCron(now int64) {
 	if (now - p.timeLastVINPoll) >= 10 {
 		if p.DebugLevel >= 12 {
-			log.Println(fmt.Sprintf("PRIMARY: Running pollCron"))
+			log.Println(log2JSONString(LogData{
+				Type:    "CRON",
+				Message: "Running pollCron",
+			}))
 		}
 		p.PollVINStart()
 		p.PollVINMiddle()
@@ -33,7 +36,11 @@ func (p *TWCPrimary) pollCron(now int64) {
 func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
 	if (now - p.timeLastSecondaryPoll) >= 10 {
 		if p.DebugLevel >= 12 {
-			log.Println(fmt.Sprintf("PRIMARY: Running pollSecondaryKWHCron"))
+			log.Println(log2JSONString(LogData{
+				Type:    "DEBUG",
+				Source:  "cron",
+				Message: "Running pollSecondaryKWHCron",
+			}))
 		}
 		p.PollSecondaryKWH()
 		p.timeLastSecondaryPoll = now
@@ -48,7 +55,11 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 		if p.EnablePowerwall && p.Powerwall != "" {
 			// if the time checks out, then we do the thing
 			if p.DebugLevel >= 12 {
-				log.Println(fmt.Sprintf("PRIMARY: Running powerwallCron %d", now-p.timeLastPowerwallCheck))
+				log.Println(log2JSONString(LogData{
+					Type:    "DEBUG",
+					Source:  "cron",
+					Message: fmt.Sprintf("Running powerwallCron %d", now-p.timeLastPowerwallCheck),
+				}))
 			}
 
 			d := &powerwall.MetersAggregates{}
@@ -105,14 +116,22 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 			// } else
 			if intAmps+offsetAmps >= p.MinAmpsPerTWC {
 				// check if the power we are getting from solar is producing enough amps, plus the amps we have as an offset
-				if p.DebugLevel == 22 {
-					log.Println(fmt.Sprintf("set the amperage to %d (based on offset)", intAmps+offsetAmps))
+				if p.DebugLevel == 12 {
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "cron",
+						Message: fmt.Sprintf("Setting the amperage to %d, including offset of %d", intAmps+offsetAmps, offsetAmps),
+					}))
 				}
 				if p.AutoStartStopInterval {
 					err = p.SetMaxAmpsHandler(intAmps + offsetAmps)
 					if err != nil {
 						if p.DebugLevel >= 12 {
-							log.Println(fmt.Sprintf("error setting the amperage to %d (based on offset)", intAmps+offsetAmps))
+							log.Println(log2JSONString(LogData{
+								Type:    "ERROR",
+								Source:  "cron",
+								Message: fmt.Sprintf("Error setting the amperage to %d, including offset of %d", intAmps+offsetAmps, offsetAmps),
+							}))
 						}
 						return
 					}
@@ -124,13 +143,21 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 				// otherwise fall back to just our offset amps
 				if offsetAmps >= p.MinAmpsPerTWC {
 					if p.DebugLevel >= 12 {
-						log.Println(fmt.Sprintf("set the amperage to %d (based on offset)", wattsToAmps(p.SupplyPhases, p.SupplyVoltage, float64(p.PowerOffset))))
+						log.Println(log2JSONString(LogData{
+							Type:    "DEBUG",
+							Source:  "cron",
+							Message: fmt.Sprintf("Setting the amperage to %d with no solar generation", offsetAmps),
+						}))
 					}
 					if p.AutoStartStopInterval {
 						err = p.SetMaxAmpsHandler(offsetAmps)
 						if err != nil {
 							if p.DebugLevel >= 12 {
-								log.Println(fmt.Sprintf("error setting the amperage to %d (based on offset)", offsetAmps))
+								log.Println(log2JSONString(LogData{
+									Type:    "ERROR",
+									Source:  "cron",
+									Message: fmt.Sprintf("Error setting the amperage to %d with no solar generation", offsetAmps),
+								}))
 							}
 							return
 						}
@@ -140,7 +167,11 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 					}
 				} else {
 					if p.DebugLevel >= 12 {
-						log.Println(fmt.Sprintf("not enough amps to cover minimum; Offset: %d, Minimum:%d", wattsToAmps(p.SupplyPhases, p.SupplyVoltage, float64(p.PowerOffset)), p.MinAmpsPerTWC))
+						log.Println(log2JSONString(LogData{
+							Type:    "DEBUG",
+							Source:  "cron",
+							Message: fmt.Sprintf("Not enough amps to cover minimum; Offset: %d, Minimum:%d", offsetAmps, p.MinAmpsPerTWC),
+						}))
 					}
 					if p.AutoStartStopInterval {
 						p.StopConnectedCars()
@@ -152,13 +183,21 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 			// this mode is basically acting just like a normal wall connector if the available amps are higher than the minimum (default 6A)
 			if p.AvailableAmps >= p.MinAmpsPerTWC {
 				if p.DebugLevel >= 12 {
-					log.Println(fmt.Sprintf("set the amperage to %d", p.AvailableAmps))
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "cron",
+						Message: fmt.Sprintf("Setting the amperage to %d", p.AvailableAmps),
+					}))
 				}
 				if p.AutoStartStopInterval {
 					err := p.SetMaxAmpsHandler(p.AvailableAmps)
 					if err != nil {
 						if p.DebugLevel >= 12 {
-							log.Println(fmt.Sprintf("error setting the amperage to %d", p.AvailableAmps))
+							log.Println(log2JSONString(LogData{
+								Type:    "ERROR",
+								Source:  "cron",
+								Message: fmt.Sprintf("Error setting the amperage to %d", p.AvailableAmps),
+							}))
 						}
 						return
 					}
@@ -168,7 +207,11 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 				}
 			} else {
 				if p.DebugLevel >= 12 {
-					log.Println(fmt.Sprintf("not enough amps to cover minimum; Available: %d, Minimum:%d", p.AvailableAmps, p.MinAmpsPerTWC))
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "cron",
+						Message: fmt.Sprintf("Not enough amps to cover minimum; Available: %d, Minimum:%d", p.AvailableAmps, p.MinAmpsPerTWC),
+					}))
 				}
 				if p.AutoStartStopInterval {
 					p.StopConnectedCars()

@@ -120,7 +120,12 @@ func (p *TWCPrimary) APIDisableTWC(w http.ResponseWriter, r *http.Request) {
 		twc, ok := p.GetSecondary(bTWCID)
 		if ok {
 			if p.DebugLevel >= 9 {
-				log.Println(fmt.Sprintf("API: Disabling secondary TWC %x%x ", bTWCID[0], bTWCID[1]))
+				log.Println(log2JSONString(LogData{
+					Type:     "DEBUG",
+					Source:   "api",
+					Receiver: fmt.Sprintf("%x", bTWCID),
+					Message:  "Disabling secondary twc",
+				}))
 			}
 			twc.AllowCharge = false
 			// _, err = p.sendChargeRate(twc.TWCID, []byte{0x00, 0x00}, byte(0x05))
@@ -151,7 +156,12 @@ func (p *TWCPrimary) APIEnableTWC(w http.ResponseWriter, r *http.Request) {
 		twc, ok := p.GetSecondary(bTWCID)
 		if ok {
 			if p.DebugLevel >= 9 {
-				log.Println(fmt.Sprintf("API: Enabling secondary TWC %x%x ", bTWCID[0], bTWCID[1]))
+				log.Println(log2JSONString(LogData{
+					Type:     "DEBUG",
+					Source:   "api",
+					Receiver: fmt.Sprintf("%x", bTWCID),
+					Message:  "Enabling secondary twc",
+				}))
 			}
 			twc.AllowCharge = true
 			// redistribute available amps over available TWCs

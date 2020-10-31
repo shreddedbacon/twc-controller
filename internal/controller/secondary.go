@@ -79,6 +79,12 @@ func (t *TWCSecondary) ReceiveSecondaryHeartbeat(heartbeatData []byte) {
 	now := time.Now().UTC().Unix()
 	t.TimeLastRx = now
 	if t.DebugLevel >= 9 {
+		log.Println(log2JSONString(LogData{
+			Type:     "INFO",
+			Source:   "secondary",
+			Receiver: fmt.Sprintf("%x", t.TWCID),
+			Message:  "Secondary heartbeat received",
+		}))
 		log.Println(fmt.Sprintf("SECONDARY: Heartbeat received"))
 	}
 
@@ -93,7 +99,12 @@ func (t *TWCSecondary) ReceiveSecondaryHeartbeat(heartbeatData []byte) {
 	if lastOffered < 0 {
 		t.LastAmpsOffered = t.ReportedAmpsMax
 		if t.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("SECONDARY: LastOffered: %x, ReportedMax %x", t.LastAmpsOffered, t.ReportedAmpsMax))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "secondary",
+				Receiver: fmt.Sprintf("%x", t.TWCID),
+				Message:  fmt.Sprintf("Secondary was last offered %x, reported maximum %x", t.LastAmpsOffered, t.ReportedAmpsMax),
+			}))
 		}
 	}
 
@@ -107,7 +118,12 @@ func (t *TWCSecondary) ReceiveSecondaryHeartbeat(heartbeatData []byte) {
 	}
 	if reportedSignificant < 0 || Bytes2Dec2(t.ReportedAmpsActual, false)-reportedSignificant > 80 {
 		if t.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("SECONDARY: ReportedActual %x", t.ReportedAmpsActual))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "secondary",
+				Receiver: fmt.Sprintf("%x", t.TWCID),
+				Message:  fmt.Sprintf("Secondary reported actual charging amperage of %x", t.ReportedAmpsActual),
+			}))
 		}
 		t.timeReportedAmpsActualChangedSignificantly = now
 		t.reportedAmpsActualSignificantChangeMonitor = t.ReportedAmpsActual
@@ -121,7 +137,13 @@ func (t *TWCSecondary) ReceiveSecondaryHeartbeat(heartbeatData []byte) {
 func (t *TWCSecondary) sendPrimaryHeartbeat(port *serial.Port, primaryID []byte) (int64, error) {
 	if t.AllowCharge {
 		if t.DebugLevel >= 9 {
-			log.Println(fmt.Sprintf("SECONDARY: Send Primary heartbeat to this Secondary TWC %x", t.TWCID))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "secondary",
+				Sender:   fmt.Sprintf("%x", primaryID),
+				Receiver: fmt.Sprintf("%x", t.TWCID),
+				Message:  "Sending hearbeat to secondary TWC",
+			}))
 		}
 		// msg := append(append(append([]byte{0xFB, 0xE0}, primaryID...), t.TWCID...), t.primaryHeartbeatData...)
 		// send heartbeat with the available amperage to this twc

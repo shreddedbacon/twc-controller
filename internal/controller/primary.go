@@ -18,7 +18,7 @@ import (
 
 var spikeAmpsToCancel6ALimit = 16
 
-// TWCPrimary .
+// TWCPrimary is the primary structure of the TWC controller
 type TWCPrimary struct {
 	port                   *serial.Port    `yaml:"-"`
 	ID                     []byte          `yaml:"-"` // []byte{0x77, 0x77}
@@ -52,10 +52,19 @@ type TeslaAPIUser struct {
 	Token    *tesla.Token
 }
 
-// SerialConfig .
+// SerialConfig contains the serial port configuration
 type SerialConfig struct {
 	DevicePath string `yaml:"port"`
 	BaudRate   int    `yaml:"baudRate"`
+}
+
+// LogData is used to encode a log to JSON for shipping somewhere later on
+type LogData struct {
+	Type     string `json:"type"`
+	Source   string `json:"source"`
+	Sender   string `json:"sender,omitempty"`
+	Receiver string `json:"receiver,omitempty"`
+	Message  string `json:"message"`
 }
 
 func getEnv(key, fallback string) string {
@@ -115,7 +124,12 @@ func (p *TWCPrimary) writeConfig() error {
 
 func (p *TWCPrimary) sendPrimaryLinkReady1() (int64, error) {
 	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Send primary linkready1")
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "primary",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Sending primary linkready1",
+		}))
 	}
 	msg := append(
 		append(
@@ -128,7 +142,12 @@ func (p *TWCPrimary) sendPrimaryLinkReady1() (int64, error) {
 
 func (p *TWCPrimary) sendPrimaryLinkReady2() (int64, error) {
 	if p.DebugLevel >= 9 {
-		log.Println("PRIMARY: Send primary linkready2")
+		log.Println(log2JSONString(LogData{
+			Type:    "INFO",
+			Source:  "primary",
+			Sender:  fmt.Sprintf("%x", p.ID),
+			Message: "Sending primary linkready2",
+		}))
 	}
 	msg := append(
 		append(
@@ -144,7 +163,13 @@ func (p *TWCPrimary) sendChargeRate(secondaryID []byte, chargeRate []byte, cmd b
 	if p.DebugLevel >= 9 {
 		// displaying the chargerate we need to divide the given value by 100
 		cr := float64(Bytes2Dec2(chargeRate, true) / 100)
-		log.Println(fmt.Sprintf("PRIMARY: Sending charge rate %05.2fA to secondary TWC %x%x", cr, secondaryID[0], secondaryID[1]))
+		log.Println(log2JSONString(LogData{
+			Type:     "INFO",
+			Source:   "primary",
+			Sender:   fmt.Sprintf("%x", p.ID),
+			Receiver: fmt.Sprintf("%x", secondaryID),
+			Message:  fmt.Sprintf("Sending charge rate %05.2fA to secondary", cr),
+		}))
 	}
 	msg := append(
 		append(
@@ -160,8 +185,13 @@ func (p *TWCPrimary) sendChargeRate(secondaryID []byte, chargeRate []byte, cmd b
 // sendStopCommand sends the desiredcharge rate to the receiver
 func (p *TWCPrimary) sendStopCommand(secondaryID []byte) (int64, error) {
 	if p.DebugLevel >= 9 {
-		// displaying the chargerate we need to divide the given value by 100
-		log.Println(fmt.Sprintf("PRIMARY: Sending stop command to secondary TWC %x%x", secondaryID[0], secondaryID[1]))
+		log.Println(log2JSONString(LogData{
+			Type:     "INFO",
+			Source:   "primary",
+			Sender:   fmt.Sprintf("%x", p.ID),
+			Receiver: fmt.Sprintf("%x", secondaryID),
+			Message:  "Sending stop command to secondary",
+		}))
 	}
 	msg := append(
 		append(
@@ -175,8 +205,13 @@ func (p *TWCPrimary) sendStopCommand(secondaryID []byte) (int64, error) {
 // sendStartCommand sends the desiredcharge rate to the receiver
 func (p *TWCPrimary) sendStartCommand(secondaryID []byte) (int64, error) {
 	if p.DebugLevel >= 9 {
-		// displaying the chargerate we need to divide the given value by 100
-		log.Println(fmt.Sprintf("PRIMARY: Sending stop command to secondary TWC %x%x", secondaryID[0], secondaryID[1]))
+		log.Println(log2JSONString(LogData{
+			Type:     "INFO",
+			Source:   "primary",
+			Sender:   fmt.Sprintf("%x", p.ID),
+			Receiver: fmt.Sprintf("%x", secondaryID),
+			Message:  "Sending start command to secondary",
+		}))
 	}
 	msg := append(
 		append(
@@ -202,7 +237,13 @@ func (p *TWCPrimary) AddSecondary(secondaryTWC *TWCSecondary, secondaryID []byte
 	_, ok := p.HasTWC(secondaryID)
 	if !ok {
 		if p.DebugLevel >= 12 {
-			log.Println(fmt.Sprintf("PRIMARY: Secondary TWC %x%x is new", secondaryID[0], secondaryID[1]))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "primary",
+				Sender:   fmt.Sprintf("%x", p.ID),
+				Receiver: fmt.Sprintf("%x", secondaryID),
+				Message:  "Secondary TWC is a new TWC",
+			}))
 		}
 		secondaryTWC, _ = NewTWCSecondary(secondaryID, p.WiringMaxAmpsPerTWC, p.port, p.WiringMaxAmpsAllTWC, p.DebugLevel)
 		p.knownTWCs = append(p.knownTWCs, secondaryTWC)
@@ -214,7 +255,13 @@ func (p *TWCPrimary) GetSecondary(secondaryID []byte) (*TWCSecondary, bool) {
 	idx, ok := p.HasTWC(secondaryID)
 	if ok {
 		if p.DebugLevel >= 12 {
-			log.Println(fmt.Sprintf("PRIMARY: Secondary TWC %x%x already found", secondaryID[0], secondaryID[1]))
+			log.Println(log2JSONString(LogData{
+				Type:     "INFO",
+				Source:   "primary",
+				Sender:   fmt.Sprintf("%x", p.ID),
+				Receiver: fmt.Sprintf("%x", secondaryID),
+				Message:  "Secondary TWC already found",
+			}))
 		}
 		return p.knownTWCs[idx], true
 	}
@@ -273,12 +320,24 @@ func (p *TWCPrimary) Run() {
 					secondaryTWC := p.knownTWCs[idxSecondaryToSendNextHeartbeat]
 					if (now - secondaryTWC.TimeLastRx) >= 26 {
 						if p.DebugLevel >= 12 {
-							log.Println(fmt.Sprintf("PRIMARY: Have not heard from Secondary TWC %x for 26 seconds, removing.", secondaryTWC.TWCID))
+							log.Println(log2JSONString(LogData{
+								Type:     "INFO",
+								Source:   "primary",
+								Sender:   fmt.Sprintf("%x", p.ID),
+								Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+								Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+							}))
 						}
 						p.RemoveSecondary(idxSecondaryToSendNextHeartbeat)
 					} else {
 						if p.DebugLevel >= 12 {
-							log.Println("PRIMARY: Send heartbeat to Secondary TWC")
+							log.Println(log2JSONString(LogData{
+								Type:     "INFO",
+								Source:   "primary",
+								Sender:   fmt.Sprintf("%x", p.ID),
+								Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+								Message:  "Sending heartbeat to secondary TWC",
+							}))
 						}
 						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 					}
@@ -305,14 +364,23 @@ func (p *TWCPrimary) Run() {
 			}
 			if msgLen == 0 && data[0] != 0xC0 {
 				if p.DebugLevel >= 12 {
-					log.Println("PRIMARY: Ignore between")
-					// ignore between
+					log.Println(log2JSONString(LogData{
+						Type:    "INFO",
+						Source:  "primary",
+						Sender:  fmt.Sprintf("%x", p.ID),
+						Message: "Ignoring data if length is 0 or first byte is not C0",
+					}))
 				}
 				ignoredData = append(ignoredData, data...)
 				continue
 			} else if msgLen > 0 && msgLen < 15 && data[0] == 0xC0 {
 				if p.DebugLevel >= 12 {
-					log.Println("PRIMARY: Found end of message before full message received")
+					log.Println(log2JSONString(LogData{
+						Type:    "INFO",
+						Source:  "primary",
+						Sender:  fmt.Sprintf("%x", p.ID),
+						Message: "Found end of message before full message received",
+					}))
 					// found end of message before full message received
 				}
 				msg = data
@@ -347,9 +415,19 @@ func (p *TWCPrimary) Run() {
 			}
 			if p.DebugLevel >= 1 {
 				if p.DebugLevel > 1 {
-					log.Println(fmt.Sprintf("Rx@: (%0X) %s", ignoredData, debugBytes))
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "primary",
+						Sender:  fmt.Sprintf("%x", p.ID),
+						Message: fmt.Sprintf("Rx@: (%0X) %s", ignoredData, debugBytes),
+					}))
 				} else {
-					log.Println(fmt.Sprintf("Rx@: %s", debugBytes))
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "primary",
+						Sender:  fmt.Sprintf("%x", p.ID),
+						Message: fmt.Sprintf("Rx@: %s", debugBytes),
+					}))
 				}
 			}
 			ignoredData = []byte{}
@@ -360,7 +438,14 @@ func (p *TWCPrimary) Run() {
 					debubByte := []byte(fmt.Sprintf("%X ", debugB))
 					debugBytes = append(debugBytes, debubByte...)
 				}
-				log.Println(fmt.Sprintf("PRIMARY: ignoring message of unexpected length, msg: %v", debugBytes))
+				if p.DebugLevel >= 2 {
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "primary",
+						Sender:  fmt.Sprintf("%x", p.ID),
+						Message: fmt.Sprintf("Ignoring message of unexpected length, msg: %v", debugBytes),
+					}))
+				}
 				continue
 			}
 			checksumExpected := msg[len(msg)-1]
@@ -375,7 +460,14 @@ func (p *TWCPrimary) Run() {
 					debubByte := []byte(fmt.Sprintf("%X ", debugB))
 					debugBytes = append(debugBytes, debubByte...)
 				}
-				log.Println(fmt.Sprintf("PRIMARY: PRIMARY: Checksum does not match %v %v %v, msg: %v", checksum&0xFF, byte(checksum&0xFF), checksumExpected, debugBytes))
+				if p.DebugLevel >= 2 {
+					log.Println(log2JSONString(LogData{
+						Type:    "DEBUG",
+						Source:  "primary",
+						Sender:  fmt.Sprintf("%x", p.ID),
+						Message: fmt.Sprintf("Checksum does not match %v %v %v, msg: %v", checksum&0xFF, byte(checksum&0xFF), checksumExpected, debugBytes),
+					}))
+				}
 				continue
 			}
 			foundMsgMatch := false
