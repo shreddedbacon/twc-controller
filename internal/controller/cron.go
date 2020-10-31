@@ -108,12 +108,14 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 				if p.DebugLevel == 22 {
 					log.Println(fmt.Sprintf("set the amperage to %d (based on offset)", intAmps+offsetAmps))
 				}
-				err = p.SetMaxAmpsHandler(intAmps + offsetAmps)
-				if err != nil {
-					if p.DebugLevel >= 12 {
-						log.Println(fmt.Sprintf("error setting the amperage to %d (based on offset)", intAmps+offsetAmps))
+				if p.AutoStartStopInterval {
+					err = p.SetMaxAmpsHandler(intAmps + offsetAmps)
+					if err != nil {
+						if p.DebugLevel >= 12 {
+							log.Println(fmt.Sprintf("error setting the amperage to %d (based on offset)", intAmps+offsetAmps))
+						}
+						return
 					}
-					return
 				}
 				if p.AutoStartStopInterval {
 					p.StartConnectedCars()
@@ -124,12 +126,14 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 					if p.DebugLevel >= 12 {
 						log.Println(fmt.Sprintf("set the amperage to %d (based on offset)", wattsToAmps(p.SupplyPhases, p.SupplyVoltage, float64(p.PowerOffset))))
 					}
-					err = p.SetMaxAmpsHandler(offsetAmps)
-					if err != nil {
-						if p.DebugLevel >= 12 {
-							log.Println(fmt.Sprintf("error setting the amperage to %d (based on offset)", offsetAmps))
+					if p.AutoStartStopInterval {
+						err = p.SetMaxAmpsHandler(offsetAmps)
+						if err != nil {
+							if p.DebugLevel >= 12 {
+								log.Println(fmt.Sprintf("error setting the amperage to %d (based on offset)", offsetAmps))
+							}
+							return
 						}
-						return
 					}
 					if p.AutoStartStopInterval {
 						p.StartConnectedCars()
@@ -150,12 +154,14 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 				if p.DebugLevel >= 12 {
 					log.Println(fmt.Sprintf("set the amperage to %d", p.AvailableAmps))
 				}
-				err := p.SetMaxAmpsHandler(p.AvailableAmps)
-				if err != nil {
-					if p.DebugLevel >= 12 {
-						log.Println(fmt.Sprintf("error setting the amperage to %d", p.AvailableAmps))
+				if p.AutoStartStopInterval {
+					err := p.SetMaxAmpsHandler(p.AvailableAmps)
+					if err != nil {
+						if p.DebugLevel >= 12 {
+							log.Println(fmt.Sprintf("error setting the amperage to %d", p.AvailableAmps))
+						}
+						return
 					}
-					return
 				}
 				if p.AutoStartStopInterval {
 					p.StartConnectedCars()
