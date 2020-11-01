@@ -20,34 +20,39 @@ func (p *TWCPrimary) RunCron() {
 
 func (p *TWCPrimary) heartbeatCron(now int64) {
 	// once linkready is done, do the heartbeat checks
+	p.twcNextHeartbeatID = 0
 	if p.numInitMsgsToSend == 0 {
-		for _, twc := range p.knownTWCs {
-			fmt.Println(twc)
-			if (now - twc.TimeLastRx) >= 26 {
-				if p.DebugLevel >= 12 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "primary",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
-					}))
+		if (now - p.timeLastTx) > 0 {
+			if len(p.knownTWCs) > 0 {
+				secondaryTWC := p.knownTWCs[p.twcNextHeartbeatID]
+				if (now - secondaryTWC.TimeLastRx) >= 26 {
+					if p.DebugLevel >= 12 {
+						log.Println(log2JSONString(LogData{
+							Type:     "INFO",
+							Source:   "primary",
+							Sender:   fmt.Sprintf("%x", p.ID),
+							Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+							Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+						}))
+					}
+					p.RemoveSecondary(p.twcNextHeartbeatID)
+				} else {
+					if p.DebugLevel >= 12 {
+						log.Println(log2JSONString(LogData{
+							Type:     "INFO",
+							Source:   "primary",
+							Sender:   fmt.Sprintf("%x", p.ID),
+							Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+							Message:  "Sending heartbeat to secondary TWC",
+						}))
+					}
+					p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 				}
-				idx, ok := p.HasTWC(twc.TWCID)
-				if ok {
-					p.RemoveSecondary(idx)
+				p.twcNextHeartbeatID++
+				if p.twcNextHeartbeatID >= len(p.knownTWCs) {
+					p.twcNextHeartbeatID = 0
 				}
-			} else {
-				if p.DebugLevel >= 12 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "primary",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Sending heartbeat to secondary TWC",
-					}))
-				}
-				p.timeLastTx, _ = twc.sendPrimaryHeartbeat(p.port, p.ID)
+				time.Sleep(150 * time.Millisecond)
 			}
 		}
 	}

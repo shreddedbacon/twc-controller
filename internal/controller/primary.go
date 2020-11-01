@@ -44,6 +44,7 @@ type TWCPrimary struct {
 	timeLastVINPoll        int64           `yaml:"-"`
 	timeLastSecondaryPoll  int64           `yaml:"-"`
 	timeLastPowerwallCheck int64           `yaml:"-"`
+	twcNextHeartbeatID     int             `yaml:"-"`
 }
 
 // TeslaAPIUser holds the API user
