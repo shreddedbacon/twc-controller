@@ -78,7 +78,7 @@ func (p *TWCPrimary) pollVin(now int64) {
 }
 
 func (p *TWCPrimary) pollState(now int64) {
-	if (now - p.timeLastStatePoll) >= 2 {
+	if (now - p.timeLastStatePoll) >= 3 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
