@@ -75,7 +75,7 @@ func (p *TWCPrimary) pollVinS(now int64) {
 }
 
 func (p *TWCPrimary) pollVinM(now int64) {
-	if (now - p.timeLastVINMPoll) >= 5 {
+	if (now - p.timeLastVINMPoll) >= 6 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -88,7 +88,7 @@ func (p *TWCPrimary) pollVinM(now int64) {
 }
 
 func (p *TWCPrimary) pollVinE(now int64) {
-	if (now - p.timeLastVINEPoll) >= 5 {
+	if (now - p.timeLastVINEPoll) >= 7 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -101,7 +101,7 @@ func (p *TWCPrimary) pollVinE(now int64) {
 }
 
 func (p *TWCPrimary) pollState(now int64) {
-	if (now - p.timeLastStatePoll) >= 10 {
+	if (now - p.timeLastStatePoll) >= 9 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -114,7 +114,7 @@ func (p *TWCPrimary) pollState(now int64) {
 }
 
 func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
-	if (now - p.timeLastSecondaryPoll) >= 30 {
+	if (now - p.timeLastSecondaryPoll) >= 32 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
