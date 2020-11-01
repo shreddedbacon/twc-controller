@@ -86,7 +86,7 @@ func (p *TWCPrimary) pollState(now int64) {
 			}))
 		}
 		p.PollPlugState()
-		p.timeLastVINPoll = now
+		p.timeLastStatePoll = now
 		time.Sleep(100 * time.Millisecond)
 	}
 }
