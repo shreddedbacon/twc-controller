@@ -13,7 +13,8 @@ import (
 func (p *TWCPrimary) RunCron() {
 	now := time.Now().UTC().Unix()
 	// p.heartbeatCron(now)
-	p.pollCron(now)
+	p.pollVin(now)
+	p.pollState(now)
 	p.pollSecondaryKWHCron(now)
 	p.powerwallCron(now)
 }
@@ -58,7 +59,7 @@ func (p *TWCPrimary) heartbeatCron(now int64) {
 	}
 }
 
-func (p *TWCPrimary) pollCron(now int64) {
+func (p *TWCPrimary) pollVin(now int64) {
 	if (now - p.timeLastVINPoll) >= 5 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
@@ -67,15 +68,31 @@ func (p *TWCPrimary) pollCron(now int64) {
 			}))
 		}
 		p.PollVINStart()
+		time.Sleep(100 * time.Millisecond)
 		p.PollVINMiddle()
+		time.Sleep(100 * time.Millisecond)
 		p.PollVINEnd()
+		p.timeLastVINPoll = now
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
+func (p *TWCPrimary) pollState(now int64) {
+	if (now - p.timeLastStatePoll) >= 2 {
+		if p.DebugLevel >= 12 {
+			log.Println(log2JSONString(LogData{
+				Type:    "DEBUG",
+				Message: "Running pollState",
+			}))
+		}
 		p.PollPlugState()
 		p.timeLastVINPoll = now
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
 func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
-	if (now - p.timeLastSecondaryPoll) >= 8 {
+	if (now - p.timeLastSecondaryPoll) >= 15 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -85,6 +102,7 @@ func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
 		}
 		p.PollSecondaryKWH()
 		p.timeLastSecondaryPoll = now
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
