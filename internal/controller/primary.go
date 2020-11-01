@@ -41,7 +41,9 @@ type TWCPrimary struct {
 	PowerOffset            int             `yaml:"powerOffset"`
 	PowerwallCheckInterval int             `yaml:"powerwallCheckInterval"`
 	TeslaAPITokens         []*TeslaAPIUser `yaml:"-"` // slice of all known tesla api tokens
-	timeLastVINPoll        int64           `yaml:"-"`
+	timeLastVINSPoll       int64           `yaml:"-"`
+	timeLastVINMPoll       int64           `yaml:"-"`
+	timeLastVINEPoll       int64           `yaml:"-"`
 	timeLastStatePoll      int64           `yaml:"-"`
 	timeLastSecondaryPoll  int64           `yaml:"-"`
 	timeLastPowerwallCheck int64           `yaml:"-"`
@@ -109,7 +111,9 @@ func NewPrimary(primary TWCPrimary, port *serial.Port) (*TWCPrimary, error) {
 		AutoStartStopInterval:  primary.AutoStartStopInterval,
 		PowerOffset:            primary.PowerOffset,
 		PowerwallCheckInterval: primary.PowerwallCheckInterval,
-		timeLastVINPoll:        time.Now().UTC().Unix(),
+		timeLastVINSPoll:       time.Now().UTC().Unix(),
+		timeLastVINMPoll:       time.Now().UTC().Unix(),
+		timeLastVINEPoll:       time.Now().UTC().Unix(),
 		timeLastStatePoll:      time.Now().UTC().Unix(),
 		timeLastSecondaryPoll:  time.Now().UTC().Unix(),
 		timeLastPowerwallCheck: time.Now().UTC().Unix(),

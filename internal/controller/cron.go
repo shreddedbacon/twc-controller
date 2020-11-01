@@ -13,7 +13,9 @@ import (
 func (p *TWCPrimary) RunCron() {
 	now := time.Now().UTC().Unix()
 	// p.heartbeatCron(now)
-	p.pollVin(now)
+	p.pollVinS(now)
+	p.pollVinM(now)
+	p.pollVinE(now)
 	p.pollState(now)
 	p.pollSecondaryKWHCron(now)
 	p.powerwallCron(now)
@@ -59,8 +61,8 @@ func (p *TWCPrimary) heartbeatCron(now int64) {
 	}
 }
 
-func (p *TWCPrimary) pollVin(now int64) {
-	if (now - p.timeLastVINPoll) >= 5 {
+func (p *TWCPrimary) pollVinS(now int64) {
+	if (now - p.timeLastVINSPoll) >= 5 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -68,17 +70,38 @@ func (p *TWCPrimary) pollVin(now int64) {
 			}))
 		}
 		p.PollVINStart()
-		time.Sleep(100 * time.Millisecond)
+		p.timeLastVINSPoll = now
+	}
+}
+
+func (p *TWCPrimary) pollVinM(now int64) {
+	if (now - p.timeLastVINMPoll) >= 5 {
+		if p.DebugLevel >= 12 {
+			log.Println(log2JSONString(LogData{
+				Type:    "DEBUG",
+				Message: "Running pollCron",
+			}))
+		}
 		p.PollVINMiddle()
-		time.Sleep(100 * time.Millisecond)
+		p.timeLastVINMPoll = now
+	}
+}
+
+func (p *TWCPrimary) pollVinE(now int64) {
+	if (now - p.timeLastVINEPoll) >= 5 {
+		if p.DebugLevel >= 12 {
+			log.Println(log2JSONString(LogData{
+				Type:    "DEBUG",
+				Message: "Running pollCron",
+			}))
+		}
 		p.PollVINEnd()
-		p.timeLastVINPoll = now
-		time.Sleep(100 * time.Millisecond)
+		p.timeLastVINEPoll = now
 	}
 }
 
 func (p *TWCPrimary) pollState(now int64) {
-	if (now - p.timeLastStatePoll) >= 3 {
+	if (now - p.timeLastStatePoll) >= 10 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -87,12 +110,11 @@ func (p *TWCPrimary) pollState(now int64) {
 		}
 		p.PollPlugState()
 		p.timeLastStatePoll = now
-		time.Sleep(100 * time.Millisecond)
 	}
 }
 
 func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
-	if (now - p.timeLastSecondaryPoll) >= 15 {
+	if (now - p.timeLastSecondaryPoll) >= 30 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -102,7 +124,6 @@ func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
 		}
 		p.PollSecondaryKWH()
 		p.timeLastSecondaryPoll = now
-		time.Sleep(100 * time.Millisecond)
 	}
 }
 
