@@ -62,7 +62,7 @@ func (p *TWCPrimary) pollCron(now int64) {
 	if (now - p.timeLastVINPoll) >= 10 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
-				Type:    "CRON",
+				Type:    "DEBUG",
 				Message: "Running pollCron",
 			}))
 		}

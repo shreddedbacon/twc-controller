@@ -420,14 +420,12 @@ func (p *TWCPrimary) Run() {
 					log.Println(log2JSONString(LogData{
 						Type:    "DEBUG",
 						Source:  "primary",
-						Sender:  fmt.Sprintf("%x", p.ID),
 						Message: fmt.Sprintf("Rx@: (%0X) %s", ignoredData, debugBytes),
 					}))
 				} else {
 					log.Println(log2JSONString(LogData{
 						Type:    "DEBUG",
 						Source:  "primary",
-						Sender:  fmt.Sprintf("%x", p.ID),
 						Message: fmt.Sprintf("Rx@: %s", debugBytes),
 					}))
 				}

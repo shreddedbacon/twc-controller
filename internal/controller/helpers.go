@@ -35,7 +35,11 @@ func SendMessage(debugLevel int, port *serial.Port, msg []byte) (int64, error) {
 		debugBytes = append(debugBytes, debubByte...)
 	}
 	if debugLevel >= 1 {
-		log.Println(fmt.Sprintf("Tx@: %s", debugBytes))
+		log.Println(log2JSONString(LogData{
+			Type:    "DEBUG",
+			Source:  "primary",
+			Message: fmt.Sprintf("Tx@: %s", debugBytes),
+		}))
 	}
 
 	// wrap the message with c0
