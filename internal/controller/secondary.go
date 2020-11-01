@@ -85,7 +85,6 @@ func (t *TWCSecondary) ReceiveSecondaryHeartbeat(heartbeatData []byte) {
 			Receiver: fmt.Sprintf("%x", t.TWCID),
 			Message:  "Secondary heartbeat received",
 		}))
-		log.Println(fmt.Sprintf("SECONDARY: Heartbeat received"))
 	}
 
 	t.ReportedAmpsMax = []byte{heartbeatData[1], heartbeatData[2]}

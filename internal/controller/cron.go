@@ -59,7 +59,7 @@ func (p *TWCPrimary) heartbeatCron(now int64) {
 }
 
 func (p *TWCPrimary) pollCron(now int64) {
-	if (now - p.timeLastVINPoll) >= 10 {
+	if (now - p.timeLastVINPoll) >= 5 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
@@ -75,7 +75,7 @@ func (p *TWCPrimary) pollCron(now int64) {
 }
 
 func (p *TWCPrimary) pollSecondaryKWHCron(now int64) {
-	if (now - p.timeLastSecondaryPoll) >= 10 {
+	if (now - p.timeLastSecondaryPoll) >= 8 {
 		if p.DebugLevel >= 12 {
 			log.Println(log2JSONString(LogData{
 				Type:    "DEBUG",
