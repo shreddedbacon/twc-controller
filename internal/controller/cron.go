@@ -12,7 +12,7 @@ import (
 // RunCron runs the cron scrips
 func (p *TWCPrimary) RunCron() {
 	now := time.Now().UTC().Unix()
-	p.heartbeatCron(now)
+	// p.heartbeatCron(now)
 	p.pollCron(now)
 	p.pollSecondaryKWHCron(now)
 	p.powerwallCron(now)

@@ -314,42 +314,42 @@ func (p *TWCPrimary) Run() {
 			p.timeLastTx, _ = p.sendPrimaryLinkReady2()
 			time.Sleep(100 * time.Millisecond)
 			p.numInitMsgsToSend = p.numInitMsgsToSend - 1
-			// } else {
-			//	@TODO: remove this after testing that it works in cron.go
-			// 	// After finishing the 5 startup linkready1 and linkready2
-			// 	if (now - p.timeLastTx) > 0 {
-			// 		if len(p.knownTWCs) > 0 {
-			// 			secondaryTWC := p.knownTWCs[idxSecondaryToSendNextHeartbeat]
-			// 			if (now - secondaryTWC.TimeLastRx) >= 26 {
-			// 				if p.DebugLevel >= 12 {
-			// 					log.Println(log2JSONString(LogData{
-			// 						Type:     "INFO",
-			// 						Source:   "primary",
-			// 						Sender:   fmt.Sprintf("%x", p.ID),
-			// 						Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-			// 						Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
-			// 					}))
-			// 				}
-			// 				p.RemoveSecondary(idxSecondaryToSendNextHeartbeat)
-			// 			} else {
-			// 				if p.DebugLevel >= 12 {
-			// 					log.Println(log2JSONString(LogData{
-			// 						Type:     "INFO",
-			// 						Source:   "primary",
-			// 						Sender:   fmt.Sprintf("%x", p.ID),
-			// 						Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-			// 						Message:  "Sending heartbeat to secondary TWC",
-			// 					}))
-			// 				}
-			// 				p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-			// 			}
-			// 			idxSecondaryToSendNextHeartbeat++
-			// 			if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
-			// 				idxSecondaryToSendNextHeartbeat = 0
-			// 			}
-			// 			time.Sleep(150 * time.Millisecond)
-			// 		}
-			// 	}
+			} else {
+				@TODO: remove this after testing that it works in cron.go
+				// After finishing the 5 startup linkready1 and linkready2
+				if (now - p.timeLastTx) > 0 {
+					if len(p.knownTWCs) > 0 {
+						secondaryTWC := p.knownTWCs[idxSecondaryToSendNextHeartbeat]
+						if (now - secondaryTWC.TimeLastRx) >= 26 {
+							if p.DebugLevel >= 12 {
+								log.Println(log2JSONString(LogData{
+									Type:     "INFO",
+									Source:   "primary",
+									Sender:   fmt.Sprintf("%x", p.ID),
+									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+									Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+								}))
+							}
+							p.RemoveSecondary(idxSecondaryToSendNextHeartbeat)
+						} else {
+							if p.DebugLevel >= 12 {
+								log.Println(log2JSONString(LogData{
+									Type:     "INFO",
+									Source:   "primary",
+									Sender:   fmt.Sprintf("%x", p.ID),
+									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+									Message:  "Sending heartbeat to secondary TWC",
+								}))
+							}
+							p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+						}
+						idxSecondaryToSendNextHeartbeat++
+						if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
+							idxSecondaryToSendNextHeartbeat = 0
+						}
+						time.Sleep(250 * time.Millisecond)
+					}
+				}
 		}
 
 		// get the message
