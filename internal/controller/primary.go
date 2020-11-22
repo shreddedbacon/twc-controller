@@ -14,6 +14,8 @@ import (
 	"github.com/shreddedbacon/tesla"
 	"github.com/tarm/serial"
 	"gopkg.in/yaml.v2"
+
+	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
 )
 
 var spikeAmpsToCancel6ALimit = 16
@@ -41,13 +43,15 @@ type TWCPrimary struct {
 	PowerOffset            int             `yaml:"powerOffset"`
 	PowerwallCheckInterval int             `yaml:"powerwallCheckInterval"`
 	TeslaAPITokens         []*TeslaAPIUser `yaml:"-"` // slice of all known tesla api tokens
-	timeLastVINSPoll       int64           `yaml:"-"`
-	timeLastVINMPoll       int64           `yaml:"-"`
-	timeLastVINEPoll       int64           `yaml:"-"`
+	timeLastVINCron        int64           `yaml:"-"`
 	timeLastStatePoll      int64           `yaml:"-"`
 	timeLastSecondaryPoll  int64           `yaml:"-"`
 	timeLastPowerwallCheck int64           `yaml:"-"`
 	twcNextHeartbeatID     int             `yaml:"-"`
+	LEDSOn                 bool            `yaml:"ledEnable"`
+	LEDController          *ledStrip       `yaml:"-"`
+	LEDValues              map[int]uint32  `yaml:"-"`
+	LEDCharging            bool            `yaml:"-"`
 }
 
 // TeslaAPIUser holds the API user
@@ -88,36 +92,48 @@ func NewPrimary(primary TWCPrimary, port *serial.Port) (*TWCPrimary, error) {
 		return nil, fmt.Errorf("supply voltage should be between 100 or 260")
 	}
 
+	// LED Controller setup
+	opt := ws2811.DefaultOptions
+	opt.Channels[0].Brightness = 150
+	opt.Channels[0].LedCount = 8
+
+	dev, err := ws2811.MakeWS2811(&opt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// start the LED loop controller
+	ls := &ledStrip{
+		ws: dev,
+	}
+	err = ls.setup()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// get the env POWERWALL_HOST as an override if defined
 	primary.Powerwall = getEnv("POWERWALL_HOST", primary.Powerwall)
-
-	return &TWCPrimary{
-		ID:                     primary.ID,
-		WiringMaxAmpsAllTWC:    primary.WiringMaxAmpsAllTWC,
-		WiringMaxAmpsPerTWC:    primary.WiringMaxAmpsPerTWC,
-		port:                   port,
-		DebugLevel:             primary.DebugLevel,
-		sign:                   []byte{0x77},
-		timeLastTx:             int64(0),
-		numInitMsgsToSend:      10,
-		SerialConfig:           primary.SerialConfig,
-		ConfigPath:             primary.ConfigPath,
-		SupplyPhases:           primary.SupplyPhases,
-		SupplyVoltage:          primary.SupplyVoltage,
-		AvailableAmps:          primary.AvailableAmps,
-		MinAmpsPerTWC:          primary.MinAmpsPerTWC,
-		Powerwall:              primary.Powerwall,
-		EnablePowerwall:        primary.EnablePowerwall,
-		AutoStartStopInterval:  primary.AutoStartStopInterval,
-		PowerOffset:            primary.PowerOffset,
-		PowerwallCheckInterval: primary.PowerwallCheckInterval,
-		timeLastVINSPoll:       time.Now().UTC().Unix(),
-		timeLastVINMPoll:       time.Now().UTC().Unix(),
-		timeLastVINEPoll:       time.Now().UTC().Unix(),
-		timeLastStatePoll:      time.Now().UTC().Unix(),
-		timeLastSecondaryPoll:  time.Now().UTC().Unix(),
-		timeLastPowerwallCheck: time.Now().UTC().Unix(),
-	}, nil
+	primary.sign = []byte{0x77}
+	primary.timeLastTx = int64(0)
+	primary.numInitMsgsToSend = 10
+	primary.timeLastVINCron = time.Now().UTC().Unix()
+	primary.timeLastStatePoll = time.Now().UTC().Unix()
+	primary.timeLastSecondaryPoll = time.Now().UTC().Unix()
+	primary.timeLastPowerwallCheck = time.Now().UTC().Unix()
+	primary.port = port
+	primary.LEDController = ls
+	primary.LEDCharging = false
+	primary.LEDValues = map[int]uint32{
+		// values are RGB hex values, 00 meaning off, ff being full colour (255)
+		0: 0x00ff00, // when not charging, set the first LED to green to indicate it is powered up (similar to the actual TWC)
+		1: 0x000000,
+		2: 0x000000, // plugstate color to indicate if a car is plugged in or not etc
+		3: 0x000000,
+		4: 0x000000, // full vin number check (green 3 parts, orange 2 parts, red 1 part, off no vin)
+		5: 0x000000,
+		6: 0x000000,
+		7: 0x000000, // the status of connected TWCs (green good, red bad, orange none found)
+	}
+	return &primary, nil
 }
 
 func (p *TWCPrimary) writeConfig() error {

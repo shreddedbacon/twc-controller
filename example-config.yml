@@ -13,3 +13,4 @@ enablePowerwall: true
 autoStartStopInterval: true
 powerOffset: 0
 powerwallCheckInterval: 5
+ledEnable: true

@@ -230,6 +230,15 @@ func (p *TWCPrimary) receivePlugState(msg []byte, foundMsgMatch *bool) {
 				Message:  fmt.Sprintf("Received from Plug state %x from secondary TWC", plugState),
 			}))
 		}
+		// set some LED values
+		switch int(plugState[0]) {
+		case 0:
+			p.SetPlugStateLED(0x000000) // set the LED to off to indicate that nothing is plugged in
+		case 1:
+			p.SetPlugStateLED(0x00ff00) // set the LED to green to indicate that a car is plugged in and charging
+		case 3:
+			p.SetPlugStateLED(0x0000ff) // set the LED to blue to indicate that a car is plugged in but not charging
+		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {
 			prevPlugState := secondaryTWC.PlugState
