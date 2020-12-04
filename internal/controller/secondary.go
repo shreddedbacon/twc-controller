@@ -35,7 +35,7 @@ type TWCSecondary struct {
 	ReportedAmpsMax    []byte `json:"reportedAmpsMax"`
 	ReportedAmpsActual []byte `json:"reportedAmpsActual"`
 	LastAmpsOffered    []byte `json:"lastAmpsOffered"`
-	ReportedState      byte   `json:"reportedState"`
+	ReportedState      int    `json:"reportedState"`
 	StatsCurrentWatts  uint32 `json:"currentkWh"` // calculated from the p1-3 voltages * reportedampsactual
 	StatsKWH           uint32 `json:"kWh"`
 	StatsP1Volts       uint16 `json:"phase1volts"`
@@ -89,7 +89,7 @@ func (t *TWCSecondary) ReceiveSecondaryHeartbeat(heartbeatData []byte) {
 
 	t.ReportedAmpsMax = []byte{heartbeatData[1], heartbeatData[2]}
 	t.ReportedAmpsActual = []byte{heartbeatData[3], heartbeatData[4]}
-	t.ReportedState = heartbeatData[0]
+	t.ReportedState = int(heartbeatData[0])
 
 	lastOffered := uint16(0)
 	if bytes.Compare(t.LastAmpsOffered, []byte{}) != 0 {

@@ -88,7 +88,7 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 					Message:  "Secondary TWC has been disabled, setting state and charge rates to 0",
 				}))
 			}
-			secondaryTWC.ReportedState = byte(99)
+			secondaryTWC.ReportedState = 99
 			secondaryTWC.ReportedAmpsActual = []byte{0x00, 0x00}
 			secondaryTWC.ReportedAmpsMax = []byte{0x00, 0x00}
 		}
