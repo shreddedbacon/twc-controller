@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"time"
@@ -89,7 +88,7 @@ func (p *TWCPrimary) PollModel() (int64, error) {
 // PollVINStart polls the secondary TWCs for the current VIN
 func (p *TWCPrimary) PollVINStart() (int64, error) {
 	for _, twc := range p.knownTWCs {
-		if bytes.Compare([]byte{twc.ReportedState}, []byte{0}) != 0 {
+		if twc.ReportedState != 0 {
 			if p.DebugLevel >= 15 {
 				log.Println(log2JSONString(LogData{
 					Type:     "INFO",
@@ -113,7 +112,7 @@ func (p *TWCPrimary) PollVINStart() (int64, error) {
 // PollVINMiddle polls the secondary TWCs for the current VIN
 func (p *TWCPrimary) PollVINMiddle() (int64, error) {
 	for _, twc := range p.knownTWCs {
-		if bytes.Compare([]byte{twc.ReportedState}, []byte{0}) != 0 {
+		if twc.ReportedState != 0 {
 			if p.DebugLevel >= 15 {
 				log.Println(log2JSONString(LogData{
 					Type:     "INFO",
@@ -137,7 +136,7 @@ func (p *TWCPrimary) PollVINMiddle() (int64, error) {
 // PollVINEnd polls the secondary TWCs for the current VIN
 func (p *TWCPrimary) PollVINEnd() (int64, error) {
 	for _, twc := range p.knownTWCs {
-		if bytes.Compare([]byte{twc.ReportedState}, []byte{0}) != 0 {
+		if twc.ReportedState != 0 {
 			if p.DebugLevel >= 15 {
 				log.Println(log2JSONString(LogData{
 					Type:     "INFO",
@@ -161,7 +160,7 @@ func (p *TWCPrimary) PollVINEnd() (int64, error) {
 // PollPlugState polls the secondary TWCs for their plug state
 func (p *TWCPrimary) PollPlugState() (int64, error) {
 	for _, twc := range p.knownTWCs {
-		if bytes.Compare([]byte{twc.ReportedState}, []byte{0}) != 0 {
+		if twc.ReportedState != 0 {
 			if p.DebugLevel >= 15 {
 				log.Println(log2JSONString(LogData{
 					Type:     "INFO",
