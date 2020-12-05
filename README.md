@@ -239,3 +239,7 @@ This could be related to two things:
   * Check you've got the correct WiFi settings configured.
 * First boot failed
   * If the first boot failed (it happens :() then try restarting the RaspberryPi (power cycle it) and see if it starts up. Sometimes cloud-init in HypriotOS doesn't run properly and a restart seems to fix it.
+
+
+## Acknowledgements
+* Heavily inspired by https://github.com/dracoventions/TWCManager
