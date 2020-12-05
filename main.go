@@ -33,7 +33,10 @@ func main() {
 	if err := d.Decode(&twcConfig); err != nil {
 		log.Fatal(err)
 	}
+	// Set the ID of the primary controller
+	twcConfig.ID = []byte{0x77, 0x77}
 
+	// Create the serial port configuration
 	serialConfig := &serial.Config{
 		Name:        twcConfig.SerialConfig.DevicePath,
 		Baud:        twcConfig.SerialConfig.BaudRate,
@@ -45,8 +48,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	twcConfig.ID = []byte{0x77, 0x77}
 
+	// Create the primary TWC controller
 	p, err := controller.NewPrimary(
 		*twcConfig,
 		sPort.port,
@@ -58,6 +61,7 @@ func main() {
 	p.PreStart()
 	// then actually run it
 	go p.Run()
+	go p.LEDLoop()
 
 	c := cron.New()
 	// Add the cron runner, every second

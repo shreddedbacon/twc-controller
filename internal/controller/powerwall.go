@@ -13,10 +13,11 @@ import (
 
 // PowerwallSettingsPage .
 type PowerwallSettingsPage struct {
-	PageName      string
-	BreadCrumbs   []BreadCrumb
-	PageData      TWCPrimary
-	PowerwallInfo powerwall.MetersAggregates
+	PageName             string
+	BreadCrumbs          []BreadCrumb
+	PageData             TWCPrimary
+	PowerwallInfo        powerwall.MetersAggregates
+	PowerwallBatteryInfo powerwall.SystemSOE
 }
 
 // GetPowerwallSettings .
@@ -27,6 +28,9 @@ func (p *TWCPrimary) GetPowerwallSettings(w http.ResponseWriter, r *http.Request
 	tpl := append(tpl1, tpl2...)
 	tpl = append(tpl, tpl3...)
 	tmpl, _ := template.New("").Funcs(funcMap).Parse(string(tpl))
+	bp := &powerwall.SystemSOE{
+		Percentage: 0.0,
+	}
 	d := &powerwall.MetersAggregates{
 		Site: &powerwall.AggregateData{
 			InstantPower: 0,
@@ -49,12 +53,17 @@ func (p *TWCPrimary) GetPowerwallSettings(w http.ResponseWriter, r *http.Request
 		if err == nil {
 			json.Unmarshal(b, d)
 		}
+		bcb, err := pw.Request("/api/system_status/soe")
+		if err == nil {
+			json.Unmarshal(bcb, bp)
+		}
 	}
 	pageData := PowerwallSettingsPage{
-		BreadCrumbs:   getBreadCrumbs("Powerwall"),
-		PageName:      "Powerwall",
-		PageData:      *p,
-		PowerwallInfo: *d,
+		BreadCrumbs:          getBreadCrumbs("Powerwall"),
+		PageName:             "Powerwall",
+		PageData:             *p,
+		PowerwallInfo:        *d,
+		PowerwallBatteryInfo: *bp,
 	}
 	tmpl.ExecuteTemplate(w, "base", pageData)
 }

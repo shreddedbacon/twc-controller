@@ -12,7 +12,71 @@ import (
 // RunCron runs the cron scrips
 func (p *TWCPrimary) RunCron() {
 	now := time.Now().UTC().Unix()
+	p.vinCron(now)
+	p.twcStatusCron(now)
 	p.powerwallCron(now)
+}
+
+func (p *TWCPrimary) twcStatusCron(now int64) {
+	if (now - p.timeLastSecondaryPoll) >= 5 {
+		if p.DebugLevel >= 12 {
+			log.Println(log2JSONString(LogData{
+				Type:    "DEBUG",
+				Source:  "cron",
+				Message: fmt.Sprintf("Running twcStatusCron %d, knownTWC count %d", now-p.timeLastSecondaryPoll, len(p.knownTWCs)),
+			}))
+		}
+		if len(p.knownTWCs) == 1 {
+			p.SetTWCStatusLED(0x00ff00)
+		} else if len(p.knownTWCs) == 0 {
+			p.SetTWCStatusLED(0xffff00)
+		}
+		p.timeLastSecondaryPoll = now
+	}
+}
+
+// check if the full vin is collected and set the VIN LED status
+// this is meant for if the controller only talks to 1 twc
+func (p *TWCPrimary) vinCron(now int64) {
+	if (now - p.timeLastVINCron) >= 5 {
+		if p.DebugLevel >= 12 {
+			log.Println(log2JSONString(LogData{
+				Type:    "DEBUG",
+				Source:  "cron",
+				Message: fmt.Sprintf("Running vin %d, knownTWC count %d", now-p.timeLastSecondaryPoll, len(p.knownTWCs)),
+			}))
+		}
+		if len(p.knownTWCs) == 1 {
+			if p.knownTWCs[0].VINStart == "" && p.knownTWCs[0].VINMiddle == "" && p.knownTWCs[0].VINEnd == "" {
+				p.SetVINLED(0x000000)
+			}
+
+			if p.knownTWCs[0].VINStart != "" && p.knownTWCs[0].VINMiddle == "" && p.knownTWCs[0].VINEnd == "" {
+				p.SetVINLED(0xff0000)
+			}
+			if p.knownTWCs[0].VINStart == "" && p.knownTWCs[0].VINMiddle != "" && p.knownTWCs[0].VINEnd == "" {
+				p.SetVINLED(0xff0000)
+			}
+			if p.knownTWCs[0].VINStart == "" && p.knownTWCs[0].VINMiddle == "" && p.knownTWCs[0].VINEnd != "" {
+				p.SetVINLED(0xff0000)
+			}
+
+			if p.knownTWCs[0].VINStart != "" && p.knownTWCs[0].VINMiddle != "" && p.knownTWCs[0].VINEnd == "" {
+				p.SetVINLED(0xffff00)
+			}
+			if p.knownTWCs[0].VINStart != "" && p.knownTWCs[0].VINMiddle == "" && p.knownTWCs[0].VINEnd != "" {
+				p.SetVINLED(0xffff00)
+			}
+			if p.knownTWCs[0].VINStart == "" && p.knownTWCs[0].VINMiddle != "" && p.knownTWCs[0].VINEnd != "" {
+				p.SetVINLED(0xffff00)
+			}
+
+			if p.knownTWCs[0].VINStart != "" && p.knownTWCs[0].VINMiddle != "" && p.knownTWCs[0].VINEnd != "" {
+				p.SetVINLED(0x00ff00)
+			}
+		}
+		p.timeLastVINCron = now
+	}
 }
 
 // this is where we check the usage from the solar/powerwall and set the available amperage on the wall connector
@@ -46,7 +110,7 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 			}
 			currentLoad := 0
 			if d.Load != nil {
-				currentLoad = int(d.Load.InstantPower * -1) // invert it so we work with positive nums
+				currentLoad = int(d.Load.InstantPower)
 			}
 			nonChargerLoad := int(currentLoad)
 			if int(currentLoad) > totalWatts {

@@ -88,7 +88,7 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 					Message:  "Secondary TWC has been disabled, setting state and charge rates to 0",
 				}))
 			}
-			secondaryTWC.ReportedState = byte(99)
+			secondaryTWC.ReportedState = 99
 			secondaryTWC.ReportedAmpsActual = []byte{0x00, 0x00}
 			secondaryTWC.ReportedAmpsMax = []byte{0x00, 0x00}
 		}
@@ -229,6 +229,15 @@ func (p *TWCPrimary) receivePlugState(msg []byte, foundMsgMatch *bool) {
 				Receiver: fmt.Sprintf("%x", p.ID),
 				Message:  fmt.Sprintf("Received from Plug state %x from secondary TWC", plugState),
 			}))
+		}
+		// set some LED values
+		switch int(plugState[0]) {
+		case 0:
+			p.SetPlugStateLED(0x000000) // set the LED to off to indicate that nothing is plugged in
+		case 1:
+			p.SetPlugStateLED(0x00ff00) // set the LED to green to indicate that a car is plugged in and charging
+		case 3:
+			p.SetPlugStateLED(0x0000ff) // set the LED to blue to indicate that a car is plugged in but not charging
 		}
 		secondaryTWC, ok := p.GetSecondary(secondaryID)
 		if ok {

@@ -20,6 +20,7 @@ func (p *TWCPrimary) APISettings(w http.ResponseWriter, r *http.Request) {
 		debugLevel := r.FormValue("debugLevel")
 		baudRate := r.FormValue("baudRate")
 		devicePath := r.FormValue("devicePath")
+		enableLed := r.FormValue("enableLed")
 		err := r.ParseForm()
 		if err != nil {
 			httpError(w, fmt.Errorf("%v", err))
@@ -80,6 +81,11 @@ func (p *TWCPrimary) APISettings(w http.ResponseWriter, r *http.Request) {
 			}
 			p.SerialConfig.BaudRate = br
 			p.SerialConfig.DevicePath = devicePath
+		}
+		if enableLed == "on" {
+			p.LEDSOn = true
+		} else {
+			p.LEDSOn = false
 		}
 		err = p.writeConfig()
 		if err != nil {

@@ -92,6 +92,7 @@ func (p *TWCPrimary) StopCharging(TWCID []byte) error {
 					if err != nil {
 						return err
 					}
+					p.LEDCharging = false
 				}
 			} else {
 				if p.DebugLevel >= 9 {
@@ -120,6 +121,7 @@ func (p *TWCPrimary) StopCharging(TWCID []byte) error {
 				if err != nil {
 					return err
 				}
+				p.LEDCharging = false
 			}
 		}
 	}
@@ -178,6 +180,7 @@ func (p *TWCPrimary) StartCharging(TWCID []byte) error {
 					if err != nil {
 						return err
 					}
+					p.LEDCharging = true
 				}
 			} else {
 				if p.DebugLevel >= 9 {
@@ -207,6 +210,7 @@ func (p *TWCPrimary) StartCharging(TWCID []byte) error {
 				if err != nil {
 					return err
 				}
+				p.LEDCharging = true
 			}
 		}
 	}

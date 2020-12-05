@@ -9,6 +9,8 @@
         <th>Site</th>
         <th>Load</th>
         <th>Solar</th>
+        <th>Battery</th>
+        <th>Battery %</th>
         <th>Exporting Solar</th>
       </tr>
     </thead>
@@ -17,6 +19,8 @@
         <td>{{ .PowerwallInfo.Site.InstantPower | RoundFloat }} Watts</td>
         <td>{{ .PowerwallInfo.Load.InstantPower | RoundFloat }} Watts</td>
         <td>{{ .PowerwallInfo.Solar.InstantPower | RoundFloat }} Watts</td>
+        <td>{{ .PowerwallInfo.Battery.InstantPower | RoundFloat }} Watts</td>
+        <td>{{ .PowerwallBatteryInfo.Percentage | RoundFloat }} %</td>
         <td>{{ if .PowerwallInfo.Site.InstantPower | IsFloatNegative }}Yes{{ else }}No{{ end }}</td>
       </tr>
     </tbody>

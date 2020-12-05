@@ -160,22 +160,22 @@ func getTime(t int64) string {
 	return unitTimeInRFC
 }
 
-func getState(t byte) string {
-	if bytes.Compare([]byte{t}, []byte{1}) == 0 {
+func getState(t int) string {
+	if t == 1 {
 		return `Charging`
-	} else if bytes.Compare([]byte{t}, []byte{2}) == 0 {
+	} else if t == 2 {
 		return `Error: Lost comms`
-	} else if bytes.Compare([]byte{t}, []byte{3}) == 0 {
+	} else if t == 3 {
 		return `Do not charge`
-	} else if bytes.Compare([]byte{t}, []byte{4}) == 0 {
+	} else if t == 4 {
 		return `Ready to charge`
-	} else if bytes.Compare([]byte{t}, []byte{5}) == 0 {
+	} else if t == 5 {
 		return `Busy`
-	} else if bytes.Compare([]byte{t}, []byte{8}) == 0 {
+	} else if t == 8 {
 		return `Preparing to charge`
-	} else if bytes.Compare([]byte{t}, []byte{9}) == 0 {
+	} else if t == 9 {
 		return `Adjusting charge rate`
-	} else if bytes.Compare([]byte{t}, []byte{99}) == 0 {
+	} else if t == 99 {
 		return `Disabled by controller`
 	}
 	return `Not charging`
