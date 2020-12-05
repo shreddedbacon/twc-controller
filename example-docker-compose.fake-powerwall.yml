@@ -1,7 +1,7 @@
 version: "2"
 services:
   twc-controller:
-    image: shreddedbacon/twc-controller:arm32v6-rpi-v0.0.3
+    image: shreddedbacon/twc-controller:arm32v6-rpi-v0.0.4
     privileged: true
     restart: always
     ports:
