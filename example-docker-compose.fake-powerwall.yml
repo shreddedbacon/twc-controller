@@ -31,6 +31,3 @@ services:
       driver: "json-file"
       options:
         max-size: "10m"
-
-volumes:
-  portainer_data:
