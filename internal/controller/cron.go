@@ -110,7 +110,7 @@ func (p *TWCPrimary) powerwallCron(now int64) {
 			}
 			currentLoad := 0
 			if d.Load != nil {
-				currentLoad = int(d.Load.InstantPower * -1) // invert it so we work with positive nums
+				currentLoad = int(d.Load.InstantPower)
 			}
 			nonChargerLoad := int(currentLoad)
 			if int(currentLoad) > totalWatts {
