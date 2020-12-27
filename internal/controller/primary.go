@@ -50,7 +50,7 @@ type TWCPrimary struct {
 	twcNextHeartbeatID     int             `yaml:"-"`
 	LEDSOn                 bool            `yaml:"ledEnable"`
 	LEDController          *ledStrip       `yaml:"-"`
-	LEDValues              map[int]uint32  `yaml:"-"`
+	LEDValues              *LEDValues      `yaml:"-"`
 	LEDCharging            bool            `yaml:"-"`
 }
 
@@ -122,16 +122,16 @@ func NewPrimary(primary TWCPrimary, port *serial.Port) (*TWCPrimary, error) {
 	primary.port = port
 	primary.LEDController = ls
 	primary.LEDCharging = false
-	primary.LEDValues = map[int]uint32{
+	primary.LEDValues = &LEDValues{
 		// values are RGB hex values, 00 meaning off, ff being full colour (255)
-		0: 0x00ff00, // when not charging, set the first LED to green to indicate it is powered up (similar to the actual TWC)
-		1: 0x000000,
-		2: 0x000000, // plugstate color to indicate if a car is plugged in or not etc
-		3: 0x000000,
-		4: 0x000000, // full vin number check (green 3 parts, orange 2 parts, red 1 part, off no vin)
-		5: 0x000000,
-		6: 0x000000,
-		7: 0x000000, // the status of connected TWCs (green good, red bad, orange none found)
+		LED1: 0x00ff00, // when not charging, set the first LED to green to indicate it is powered up (similar to the actual TWC)
+		LED2: 0x000000,
+		LED3: 0x000000, // plugstate color to indicate if a car is plugged in or not etc
+		LED4: 0x000000,
+		LED5: 0x000000, // full vin number check (green 3 parts, orange 2 parts, red 1 part, off no vin)
+		LED6: 0x000000,
+		LED7: 0x000000,
+		LED8: 0x000000, // the status of connected TWCs (green good, red bad, orange none found)
 	}
 	return &primary, nil
 }

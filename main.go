@@ -61,6 +61,7 @@ func main() {
 	p.PreStart()
 	// then actually run it
 	go p.Run()
+	// start the LED loop
 	go p.LEDLoop()
 
 	c := cron.New()
