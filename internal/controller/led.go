@@ -72,7 +72,6 @@ func (p *TWCPrimary) LEDLoop() {
 				p.LEDController.wipe(uint32(0x00ff00))
 				p.LEDController.wipe(uint32(0x000000))
 			} else {
-				p.LEDController.wipe(uint32(0x000000))
 				p.LEDController.display(*p.LEDValues)
 			}
 		} else {
