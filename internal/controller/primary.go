@@ -52,6 +52,7 @@ type TWCPrimary struct {
 	LEDController          *ledStrip       `yaml:"-"`
 	LEDValues              *LEDValues      `yaml:"-"`
 	LEDCharging            bool            `yaml:"-"`
+	twcBuildVersion        string          `yaml:"-"`
 }
 
 // TeslaAPIUser holds the API user
@@ -111,6 +112,7 @@ func NewPrimary(primary TWCPrimary, port *serial.Port) (*TWCPrimary, error) {
 	}
 
 	// get the env POWERWALL_HOST as an override if defined
+	primary.twcBuildVersion = getEnv("TWC_BUILD_VERSION", "")
 	primary.Powerwall = getEnv("POWERWALL_HOST", primary.Powerwall)
 	primary.sign = []byte{0x77}
 	primary.timeLastTx = int64(0)

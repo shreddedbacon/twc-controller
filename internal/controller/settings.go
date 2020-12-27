@@ -108,7 +108,7 @@ func (p *TWCPrimary) GetPrimarySettings(w http.ResponseWriter, r *http.Request) 
 	pageData := SettingsPage{
 		BreadCrumbs: getBreadCrumbs("Settings"),
 		PageName:    "Settings",
-		PageData:    *p,
+		PrimaryData: *p,
 	}
 	tpl1, _ := ui.Asset("templates/settings.html")
 	tpl2, _ := ui.Asset("templates/home.html")

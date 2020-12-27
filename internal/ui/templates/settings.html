@@ -12,32 +12,32 @@
             <div class="form-group">
               <label for="wiringMaxAmpsAllTWC">Maximum wiring amps</label>
               <input type="number" class="form-control" name="wiringMaxAmpsAllTWC" id="wiringMaxAmpsAllTWC"
-                placeholder="32" value="{{ .PageData.WiringMaxAmpsAllTWC }}">
+                placeholder="32" value="{{ .PrimaryData.WiringMaxAmpsAllTWC }}">
             </div>
             <div class="form-group">
               <label for="wiringMaxAmpsPerTWC">Maximum amps per Wall Connector</label>
               <input type="number" class="form-control" name="wiringMaxAmpsPerTWC" id="wiringMaxAmpsPerTWC"
-                placeholder="32" value="{{ .PageData.WiringMaxAmpsPerTWC }}">
+                placeholder="32" value="{{ .PrimaryData.WiringMaxAmpsPerTWC }}">
             </div>
             <div class="form-group">
               <label for="minAmpsPerTWC">Minimum amps per Wall Connector</label>
               <input type="number" class="form-control" name="minAmpsPerTWC" id="minAmpsPerTWC" placeholder="12"
-                value="{{ .PageData.MinAmpsPerTWC }}">
+                value="{{ .PrimaryData.MinAmpsPerTWC }}">
             </div>
             <div class="form-group">
               <label for="supplyVoltage">Supply Voltage (100 to 260)</label>
               <input type="number" class="form-control" name="supplyVoltage" id="supplyVoltage" placeholder="1"
-                value="{{ .PageData.SupplyVoltage }}">
+                value="{{ .PrimaryData.SupplyVoltage }}">
             </div>
             <div class="form-group">
               <label for="supplyPhases">Supply Phases (1 or 3)</label>
               <input type="number" class="form-control" name="supplyPhases" id="supplyPhases" placeholder="1"
-                value="{{ .PageData.SupplyPhases }}">
+                value="{{ .PrimaryData.SupplyPhases }}">
             </div>
             <div class="form-group">
               <label for="debugLevel">Debug Level</label>
               <input type="number" class="form-control" name="debugLevel" id="debugLevel" placeholder="1"
-                value="{{ .PageData.DebugLevel }}">
+                value="{{ .PrimaryData.DebugLevel }}">
             </div>
             <div class="modal-footer">
               <button type="submit" class="btn btn-custom">Update</button>
@@ -67,18 +67,18 @@
             <div class="form-group">
               <label for="devicePath">Device Path</label>
               <input type="text" class="form-control" name="devicePath" id="devicePath" placeholder="/dev/ttyUSB0"
-                value="{{ .PageData.SerialConfig.DevicePath }}">
+                value="{{ .PrimaryData.SerialConfig.DevicePath }}">
             </div>
             <div class="form-group">
               <label for="baudRate">Baud Rate</label>
               <input type="number" class="form-control" name="baudRate" id="baudRate" placeholder="1"
-                value="{{ .PageData.SerialConfig.BaudRate }}">
+                value="{{ .PrimaryData.SerialConfig.BaudRate }}">
             </div>
             <div class="form-group">
               <label for="enableLed">Enable LED</label>
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="enableLed" name="enableLed"
-                  {{ if .PageData.LEDSOn }}checked{{ end }}>
+                  {{ if .PrimaryData.LEDSOn }}checked{{ end }}>
                 <label class="custom-control-label" for="enableLed">Enabled</label>
               </div>
             </div>

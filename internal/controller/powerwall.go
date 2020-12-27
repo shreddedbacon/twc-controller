@@ -15,7 +15,7 @@ import (
 type PowerwallSettingsPage struct {
 	PageName             string
 	BreadCrumbs          []BreadCrumb
-	PageData             TWCPrimary
+	PrimaryData          TWCPrimary
 	PowerwallInfo        powerwall.MetersAggregates
 	PowerwallBatteryInfo powerwall.SystemSOE
 }
@@ -61,7 +61,7 @@ func (p *TWCPrimary) GetPowerwallSettings(w http.ResponseWriter, r *http.Request
 	pageData := PowerwallSettingsPage{
 		BreadCrumbs:          getBreadCrumbs("Powerwall"),
 		PageName:             "Powerwall",
-		PageData:             *p,
+		PrimaryData:          *p,
 		PowerwallInfo:        *d,
 		PowerwallBatteryInfo: *bp,
 	}

@@ -64,7 +64,7 @@ type StatsPage struct {
 type SettingsPage struct {
 	PageName    string
 	BreadCrumbs []BreadCrumb
-	PageData    TWCPrimary
+	PrimaryData TWCPrimary
 }
 
 // TWCInfoPage .

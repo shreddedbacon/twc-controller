@@ -36,6 +36,8 @@ RUN GOOS=linux GOARCH=arm GO111MODULE=on go build -ldflags="-extldflags=-static"
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 #FROM gcr.io/distroless/static:nonroot
 FROM discolix/static:nonroot
+ARG TWC_BUILD_VERSION
+ENV TWC_BUILD_VERSION=${TWC_BUILD_VERSION}
 WORKDIR /
 COPY --from=builder /workspace/controller .
 USER root:root

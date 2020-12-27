@@ -57,7 +57,7 @@ func containsAPIUser(slice []*TeslaAPIUser, s *TeslaAPIUser) (int, bool) {
 type TeslaAPIPage struct {
 	PageName    string
 	BreadCrumbs []BreadCrumb
-	PageData    TWCPrimary
+	PrimaryData TWCPrimary
 }
 
 // GetTeslaAPIUsers displays
@@ -65,7 +65,7 @@ func (p *TWCPrimary) GetTeslaAPIUsers(w http.ResponseWriter, r *http.Request) {
 	pageData := TeslaAPIPage{
 		BreadCrumbs: getBreadCrumbs("Accounts"),
 		PageName:    "Accounts",
-		PageData:    *p,
+		PrimaryData: *p,
 	}
 	tpl1, _ := ui.Asset("templates/accounts.html")
 	tpl2, _ := ui.Asset("templates/home.html")

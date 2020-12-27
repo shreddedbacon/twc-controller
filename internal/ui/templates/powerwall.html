@@ -2,7 +2,7 @@
 <div class="container">
   <span class="section-title">{{ .PageName }}</span>
   <hr>
-  {{ if .PageData.EnablePowerwall }}
+  {{ if .PrimaryData.EnablePowerwall }}
   <table id="projectinfo" class="table table-striped table-hover custom-table" style="width:100%">
     <thead class="text-white bg-custom">
       <tr>
@@ -36,7 +36,7 @@
               <label for="enablePowerwall">Enable Powerwall Monitoring</label>
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="enablePowerwall" name="enablePowerwall"
-                  {{ if .PageData.EnablePowerwall }}checked{{ end }}>
+                  {{ if .PrimaryData.EnablePowerwall }}checked{{ end }}>
                 <label class="custom-control-label" for="enablePowerwall">Enabled</label>
               </div>
             </div>
@@ -44,24 +44,24 @@
               <label for="autoStartStopInterval">Auto Start/Stop on Interval Check</label>
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="autoStartStopInterval"
-                  name="autoStartStopInterval" {{ if .PageData.AutoStartStopInterval }}checked{{ end }}>
+                  name="autoStartStopInterval" {{ if .PrimaryData.AutoStartStopInterval }}checked{{ end }}>
                 <label class="custom-control-label" for="autoStartStopInterval">Enabled</label>
               </div>
             </div>
             <div class="form-group">
               <label for="powerwall">Powerwall Address (Local)</label>
               <input type="text" class="form-control" name="powerwall" id="powerwall"
-                placeholder="http://powerwall.local" value="{{ .PageData.Powerwall }}">
+                placeholder="http://powerwall.local" value="{{ .PrimaryData.Powerwall }}">
             </div>
             <div class="form-group">
               <label for="powerwallCheckInterval">Check Interval (minutes)</label>
               <input type="number" class="form-control" name="powerwallCheckInterval" id="powerwallCheckInterval"
-                placeholder="5" value="{{ .PageData.PowerwallCheckInterval }}">
+                placeholder="5" value="{{ .PrimaryData.PowerwallCheckInterval }}">
             </div>
             <div class="form-group">
               <label for="powerOffset">Power Offset (Watts)</label>
               <input type="number" class="form-control" name="powerOffset" id="powerOffset" placeholder="0"
-                value="{{ .PageData.PowerOffset }}">
+                value="{{ .PrimaryData.PowerOffset }}">
             </div>
             <div class="form-group">
               <label for="powerOffsetAmps">Power Offset (Amps)</label>

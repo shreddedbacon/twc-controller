@@ -11,7 +11,7 @@
       </tr>
     </thead>
     <tbody>
-      {{range .PageData.TeslaAPITokens}}
+      {{range .PrimaryData.TeslaAPITokens}}
       <tr>
         <td>{{ .Username }}</td>
         <td>{{ .Token.Expires | GetTime }}</td>
