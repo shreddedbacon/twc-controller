@@ -53,9 +53,6 @@ func (ls *ledStrip) display(ledValues LEDValues) error {
 	ls.ws.Leds(0)[5] = ledValues.LED6
 	ls.ws.Leds(0)[6] = ledValues.LED7
 	ls.ws.Leds(0)[7] = ledValues.LED8
-	if err := ls.ws.Render(); err != nil {
-		return err
-	}
 	time.Sleep(50 * time.Millisecond)
 	if err := ls.ws.Render(); err != nil {
 		return err
