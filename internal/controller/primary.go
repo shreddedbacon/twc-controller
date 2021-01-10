@@ -378,8 +378,7 @@ func (p *TWCPrimary) Run() {
 			}
 		}
 		p.ReadMessage()
-
-		if vinSCount == 9 {
+		if vinSCount == 2 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -398,7 +397,7 @@ func (p *TWCPrimary) Run() {
 			}
 			vinSCount = 0
 		}
-		if vinMCount == 10 {
+		if vinMCount == 4 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -417,7 +416,7 @@ func (p *TWCPrimary) Run() {
 			}
 			vinMCount = 0
 		}
-		if vinECount == 11 {
+		if vinECount == 6 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -436,26 +435,8 @@ func (p *TWCPrimary) Run() {
 			}
 			vinECount = 0
 		}
-		if kwhCount == 12 {
-			for _, twc := range p.knownTWCs {
-				if p.DebugLevel >= 15 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "polling",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Poll secondary for stats",
-					}))
-				}
-				msg := append(append([]byte{0xFB, 0xEB}, p.ID...), twc.TWCID...)
-				padBytes(&msg)
-				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(500 * time.Millisecond)
-				p.ReadMessage()
-			}
-			kwhCount = 0
-		}
-		if plugCount == 5 {
+
+		if plugCount == 8 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -473,6 +454,25 @@ func (p *TWCPrimary) Run() {
 				p.ReadMessage()
 			}
 			plugCount = 0
+		}
+		if kwhCount == 10 {
+			for _, twc := range p.knownTWCs {
+				if p.DebugLevel >= 15 {
+					log.Println(log2JSONString(LogData{
+						Type:     "INFO",
+						Source:   "polling",
+						Sender:   fmt.Sprintf("%x", p.ID),
+						Receiver: fmt.Sprintf("%x", twc.TWCID),
+						Message:  "Poll secondary for stats",
+					}))
+				}
+				msg := append(append([]byte{0xFB, 0xEB}, p.ID...), twc.TWCID...)
+				padBytes(&msg)
+				_, _ = SendMessage(p.DebugLevel, p.port, msg)
+				time.Sleep(500 * time.Millisecond)
+				p.ReadMessage()
+			}
+			kwhCount = 0
 		}
 
 		plugCount++
