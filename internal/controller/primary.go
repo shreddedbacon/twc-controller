@@ -569,6 +569,12 @@ func (p *TWCPrimary) ReadMessage() {
 			}
 		}
 		ignoredData = []byte{}
+		// if the first byte received is `C0` strip it off
+		if bytes.Compare(msg[0:1], []byte{0xC0}) == 0 {
+			reverseSlice(msg)
+			msg = msg[:len(msg)-1]
+			reverseSlice(msg)
+		}
 		if len(msg) != 14 && len(msg) != 16 && len(msg) != 20 {
 			// ignoring message of unexpected length
 			var debugBytes []byte

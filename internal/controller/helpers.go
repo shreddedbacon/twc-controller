@@ -5,10 +5,12 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math"
 	"net/http"
+	"reflect"
 	"strings"
 	"text/template"
 	"time"
@@ -84,6 +86,20 @@ func unescapeMessage(msg []byte, msgLen int) []byte {
 	unescapedMsg := msg[0:msgLen]
 	unescapedMsg = bytes.Replace(msg, []byte{0xDB, 0xDC}, []byte{0xC0}, 1)
 	return unescapedMsg[1 : len(unescapedMsg)-1]
+}
+
+func reverseSlice(data interface{}) {
+	value := reflect.ValueOf(data)
+	if value.Kind() != reflect.Slice {
+		panic(errors.New("data must be a slice type"))
+	}
+	valueLen := value.Len()
+	for i := 0; i <= int((valueLen-1)/2); i++ {
+		reverseIndex := valueLen - 1 - i
+		tmp := value.Index(reverseIndex).Interface()
+		value.Index(reverseIndex).Set(value.Index(i))
+		value.Index(i).Set(reflect.ValueOf(tmp))
+	}
 }
 
 func wattsToAmps(phases int, voltage int, watts float64) int {
