@@ -326,7 +326,7 @@ func (p *TWCPrimary) Run() {
 	var kwhCount = 0
 	var plugCount = 0
 
-	readWait := 600 * time.Millisecond
+	readWait := 100 * time.Millisecond
 
 	for {
 		time.Sleep(25 * time.Millisecond)
@@ -370,7 +370,7 @@ func (p *TWCPrimary) Run() {
 							}))
 						}
 						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-						time.Sleep(100 * time.Millisecond)
+						time.Sleep(readWait)
 					}
 					idxSecondaryToSendNextHeartbeat++
 					if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
