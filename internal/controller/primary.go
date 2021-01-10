@@ -368,7 +368,7 @@ func (p *TWCPrimary) Run() {
 							}))
 						}
 						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-						time.Sleep(200 * time.Millisecond)
+						time.Sleep(500 * time.Millisecond)
 					}
 					idxSecondaryToSendNextHeartbeat++
 					if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
@@ -393,7 +393,7 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xEE}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				p.ReadMessage()
 			}
 			vinSCount = 0
@@ -412,7 +412,7 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xEF}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				p.ReadMessage()
 			}
 			vinMCount = 0
@@ -431,7 +431,7 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xF1}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				p.ReadMessage()
 			}
 			vinECount = 0
@@ -450,7 +450,7 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xEB}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				p.ReadMessage()
 			}
 			kwhCount = 0
@@ -469,7 +469,7 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xB4}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				p.ReadMessage()
 			}
 			plugCount = 0
