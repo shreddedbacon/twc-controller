@@ -299,22 +299,22 @@ func (p *TWCPrimary) RemoveSecondary(i int) {
 	p.knownTWCs = p.knownTWCs[:len(p.knownTWCs)-1]
 }
 
-// // PreStart pre-starts the controller by running the link ready process initially
-// func (p *TWCPrimary) PreStart() {
-// 	time.Sleep(2 * time.Second)
+// PreStart pre-starts the controller by running the link ready process initially
+func (p *TWCPrimary) PreStart() {
+	time.Sleep(2 * time.Second)
 
-// 	if p.numInitMsgsToSend > 5 {
-// 		p.timeLastTx, _ = p.sendPrimaryLinkReady1()
-// 		time.Sleep(100 * time.Millisecond)
-// 		p.numInitMsgsToSend--
-// 	} else if p.numInitMsgsToSend > 0 {
-// 		p.timeLastTx, _ = p.sendPrimaryLinkReady2()
-// 		time.Sleep(100 * time.Millisecond)
-// 		p.numInitMsgsToSend = p.numInitMsgsToSend - 1
-// 	}
+	if p.numInitMsgsToSend > 5 {
+		p.timeLastTx, _ = p.sendPrimaryLinkReady1()
+		time.Sleep(100 * time.Millisecond)
+		p.numInitMsgsToSend--
+	} else if p.numInitMsgsToSend > 0 {
+		p.timeLastTx, _ = p.sendPrimaryLinkReady2()
+		time.Sleep(100 * time.Millisecond)
+		p.numInitMsgsToSend = p.numInitMsgsToSend - 1
+	}
 
-// 	time.Sleep(2 * time.Second)
-// }
+	time.Sleep(2 * time.Second)
+}
 
 // Run runs the primary controller.
 func (p *TWCPrimary) Run() {
