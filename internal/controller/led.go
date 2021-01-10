@@ -62,18 +62,20 @@ func (ls *ledStrip) display(ledValues LEDValues) error {
 
 // LEDLoop is the always running loop that controls the LEDs
 func (p *TWCPrimary) LEDLoop() {
+	prevLEDSOn := false
 	for {
 		time.Sleep(10 * time.Millisecond)
-		if p.LEDSOn == true {
+		if prevLEDSOn == false && p.LEDSOn == true {
 			if p.LEDCharging {
 				p.LEDController.wipe(uint32(0x00ff00))
 				p.LEDController.wipe(uint32(0x000000))
 			} else {
 				p.LEDController.display(*p.LEDValues)
 			}
-		} else {
+		} else if prevLEDSOn == true && p.LEDSOn == false {
 			p.LEDController.wipe(uint32(0x000000))
 		}
+		prevLEDSOn = p.LEDSOn
 	}
 }
 
