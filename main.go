@@ -44,9 +44,13 @@ func main() {
 		// Size:        8,
 	}
 	twcConfig.ConfigPath = configPath
-	sPort, err := newSerialPort(serialConfig)
+	port, err := serial.OpenPort(serialConfig)
 	if err != nil {
 		log.Fatal(err)
+	}
+	defer port.Close()
+	sPort := &SerialPort{
+		port: port,
 	}
 
 	// Create the primary TWC controller
@@ -136,12 +140,13 @@ type SerialPort struct {
 	port *serial.Port
 }
 
-func newSerialPort(config *serial.Config) (*SerialPort, error) {
-	port, err := serial.OpenPort(config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return &SerialPort{
-		port: port,
-	}, nil
-}
+// func newSerialPort(config *serial.Config) (*SerialPort, error) {
+// 	port, err := serial.OpenPort(config)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer port.C
+// 	return &SerialPort{
+// 		port: port,
+// 	}, nil
+// }
