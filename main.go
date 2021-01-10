@@ -58,7 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// pre start the controller
-	// p.PreStart()
+	p.PreStart()
 	// then actually run it
 	go p.Run()
 	// start the LED loop
