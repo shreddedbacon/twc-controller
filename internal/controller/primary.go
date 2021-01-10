@@ -370,7 +370,7 @@ func (p *TWCPrimary) Run() {
 							}))
 						}
 						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-						time.Sleep(readWait)
+						time.Sleep(100 * time.Millisecond)
 					}
 					idxSecondaryToSendNextHeartbeat++
 					if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
