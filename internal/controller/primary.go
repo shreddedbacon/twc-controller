@@ -326,7 +326,7 @@ func (p *TWCPrimary) Run() {
 	var kwhCount = 0
 	var plugCount = 0
 
-	readWait := 100 * time.Millisecond
+	readWait := 500 * time.Millisecond
 
 	for {
 		time.Sleep(25 * time.Millisecond)
