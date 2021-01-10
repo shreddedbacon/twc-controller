@@ -299,22 +299,22 @@ func (p *TWCPrimary) RemoveSecondary(i int) {
 	p.knownTWCs = p.knownTWCs[:len(p.knownTWCs)-1]
 }
 
-// PreStart pre-starts the controller by running the link ready process initially
-func (p *TWCPrimary) PreStart() {
-	time.Sleep(2 * time.Second)
+// // PreStart pre-starts the controller by running the link ready process initially
+// func (p *TWCPrimary) PreStart() {
+// 	time.Sleep(2 * time.Second)
 
-	if p.numInitMsgsToSend > 5 {
-		p.timeLastTx, _ = p.sendPrimaryLinkReady1()
-		time.Sleep(100 * time.Millisecond)
-		p.numInitMsgsToSend--
-	} else if p.numInitMsgsToSend > 0 {
-		p.timeLastTx, _ = p.sendPrimaryLinkReady2()
-		time.Sleep(100 * time.Millisecond)
-		p.numInitMsgsToSend = p.numInitMsgsToSend - 1
-	}
+// 	if p.numInitMsgsToSend > 5 {
+// 		p.timeLastTx, _ = p.sendPrimaryLinkReady1()
+// 		time.Sleep(100 * time.Millisecond)
+// 		p.numInitMsgsToSend--
+// 	} else if p.numInitMsgsToSend > 0 {
+// 		p.timeLastTx, _ = p.sendPrimaryLinkReady2()
+// 		time.Sleep(100 * time.Millisecond)
+// 		p.numInitMsgsToSend = p.numInitMsgsToSend - 1
+// 	}
 
-	time.Sleep(2 * time.Second)
-}
+// 	time.Sleep(2 * time.Second)
+// }
 
 // Run runs the primary controller.
 func (p *TWCPrimary) Run() {
@@ -325,6 +325,8 @@ func (p *TWCPrimary) Run() {
 	var vinECount = 0
 	var kwhCount = 0
 	var plugCount = 0
+
+	readWait := 600 * time.Millisecond
 
 	for {
 		time.Sleep(25 * time.Millisecond)
@@ -368,7 +370,7 @@ func (p *TWCPrimary) Run() {
 							}))
 						}
 						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-						time.Sleep(200 * time.Millisecond)
+						time.Sleep(readWait)
 					}
 					idxSecondaryToSendNextHeartbeat++
 					if idxSecondaryToSendNextHeartbeat >= len(p.knownTWCs) {
@@ -378,8 +380,7 @@ func (p *TWCPrimary) Run() {
 			}
 		}
 		p.ReadMessage()
-
-		if vinSCount == 9 {
+		if vinSCount == 2 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -393,12 +394,12 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xEE}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(500 * time.Millisecond)
 				p.ReadMessage()
 			}
 			vinSCount = 0
 		}
-		if vinMCount == 10 {
+		if vinMCount == 4 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -412,12 +413,12 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xEF}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(readWait)
 				p.ReadMessage()
 			}
 			vinMCount = 0
 		}
-		if vinECount == 11 {
+		if vinECount == 6 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -431,31 +432,13 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xF1}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(readWait)
 				p.ReadMessage()
 			}
 			vinECount = 0
 		}
-		if kwhCount == 12 {
-			for _, twc := range p.knownTWCs {
-				if p.DebugLevel >= 15 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "polling",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Poll secondary for stats",
-					}))
-				}
-				msg := append(append([]byte{0xFB, 0xEB}, p.ID...), twc.TWCID...)
-				padBytes(&msg)
-				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
-				p.ReadMessage()
-			}
-			kwhCount = 0
-		}
-		if plugCount == 5 {
+
+		if plugCount == 8 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
 					log.Println(log2JSONString(LogData{
@@ -469,10 +452,29 @@ func (p *TWCPrimary) Run() {
 				msg := append(append([]byte{0xFB, 0xB4}, p.ID...), twc.TWCID...)
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(200 * time.Millisecond)
+				time.Sleep(readWait)
 				p.ReadMessage()
 			}
 			plugCount = 0
+		}
+		if kwhCount == 10 {
+			for _, twc := range p.knownTWCs {
+				if p.DebugLevel >= 15 {
+					log.Println(log2JSONString(LogData{
+						Type:     "INFO",
+						Source:   "polling",
+						Sender:   fmt.Sprintf("%x", p.ID),
+						Receiver: fmt.Sprintf("%x", twc.TWCID),
+						Message:  "Poll secondary for stats",
+					}))
+				}
+				msg := append(append([]byte{0xFB, 0xEB}, p.ID...), twc.TWCID...)
+				padBytes(&msg)
+				_, _ = SendMessage(p.DebugLevel, p.port, msg)
+				time.Sleep(readWait)
+				p.ReadMessage()
+			}
+			kwhCount = 0
 		}
 
 		plugCount++
