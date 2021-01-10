@@ -57,7 +57,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	go p.ReadMessage()
 	// pre start the controller
 	p.PreStart()
 	// then actually run it

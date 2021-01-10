@@ -326,7 +326,7 @@ func (p *TWCPrimary) Run() {
 	var kwhCount = 0
 	var plugCount = 0
 
-	readWait := 200 * time.Millisecond
+	readWait := 100 * time.Millisecond
 
 	for {
 		time.Sleep(25 * time.Millisecond)
@@ -379,79 +379,84 @@ func (p *TWCPrimary) Run() {
 				}
 			}
 		}
-		if vinSCount == 2 {
-			for _, twc := range p.knownTWCs {
-				if p.DebugLevel >= 15 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "polling",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Poll Secondary for VIN start",
-					}))
-				}
-				msg := append(append([]byte{0xFB, 0xEE}, p.ID...), twc.TWCID...)
-				padBytes(&msg)
-				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(readWait)
-			}
-			vinSCount = 0
-		}
-		if vinMCount == 4 {
-			for _, twc := range p.knownTWCs {
-				if p.DebugLevel >= 15 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "polling",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Poll Secondary for VIN middle",
-					}))
-				}
-				msg := append(append([]byte{0xFB, 0xEF}, p.ID...), twc.TWCID...)
-				padBytes(&msg)
-				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(readWait)
-			}
-			vinMCount = 0
-		}
-		if vinECount == 6 {
-			for _, twc := range p.knownTWCs {
-				if p.DebugLevel >= 15 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "polling",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Poll Secondary for VIN end",
-					}))
-				}
-				msg := append(append([]byte{0xFB, 0xF1}, p.ID...), twc.TWCID...)
-				padBytes(&msg)
-				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(readWait)
-			}
-			vinECount = 0
-		}
+		p.ReadMessage()
+		// if vinSCount == 2 {
+		// 	for _, twc := range p.knownTWCs {
+		// 		if p.DebugLevel >= 15 {
+		// 			log.Println(log2JSONString(LogData{
+		// 				Type:     "INFO",
+		// 				Source:   "polling",
+		// 				Sender:   fmt.Sprintf("%x", p.ID),
+		// 				Receiver: fmt.Sprintf("%x", twc.TWCID),
+		// 				Message:  "Poll Secondary for VIN start",
+		// 			}))
+		// 		}
+		// 		msg := append(append([]byte{0xFB, 0xEE}, p.ID...), twc.TWCID...)
+		// 		padBytes(&msg)
+		// 		_, _ = SendMessage(p.DebugLevel, p.port, msg)
+		// 		time.Sleep(readWait)
+		// 		p.ReadMessage()
+		// 	}
+		// 	vinSCount = 0
+		// }
+		// if vinMCount == 4 {
+		// 	for _, twc := range p.knownTWCs {
+		// 		if p.DebugLevel >= 15 {
+		// 			log.Println(log2JSONString(LogData{
+		// 				Type:     "INFO",
+		// 				Source:   "polling",
+		// 				Sender:   fmt.Sprintf("%x", p.ID),
+		// 				Receiver: fmt.Sprintf("%x", twc.TWCID),
+		// 				Message:  "Poll Secondary for VIN middle",
+		// 			}))
+		// 		}
+		// 		msg := append(append([]byte{0xFB, 0xEF}, p.ID...), twc.TWCID...)
+		// 		padBytes(&msg)
+		// 		_, _ = SendMessage(p.DebugLevel, p.port, msg)
+		// 		time.Sleep(readWait)
+		// 		p.ReadMessage()
+		// 	}
+		// 	vinMCount = 0
+		// }
+		// if vinECount == 6 {
+		// 	for _, twc := range p.knownTWCs {
+		// 		if p.DebugLevel >= 15 {
+		// 			log.Println(log2JSONString(LogData{
+		// 				Type:     "INFO",
+		// 				Source:   "polling",
+		// 				Sender:   fmt.Sprintf("%x", p.ID),
+		// 				Receiver: fmt.Sprintf("%x", twc.TWCID),
+		// 				Message:  "Poll Secondary for VIN end",
+		// 			}))
+		// 		}
+		// 		msg := append(append([]byte{0xFB, 0xF1}, p.ID...), twc.TWCID...)
+		// 		padBytes(&msg)
+		// 		_, _ = SendMessage(p.DebugLevel, p.port, msg)
+		// 		time.Sleep(readWait)
+		// 		p.ReadMessage()
+		// 	}
+		// 	vinECount = 0
+		// }
 
-		if plugCount == 8 {
-			for _, twc := range p.knownTWCs {
-				if p.DebugLevel >= 15 {
-					log.Println(log2JSONString(LogData{
-						Type:     "INFO",
-						Source:   "polling",
-						Sender:   fmt.Sprintf("%x", p.ID),
-						Receiver: fmt.Sprintf("%x", twc.TWCID),
-						Message:  "Poll Secondary for plug state",
-					}))
-				}
-				msg := append(append([]byte{0xFB, 0xB4}, p.ID...), twc.TWCID...)
-				padBytes(&msg)
-				_, _ = SendMessage(p.DebugLevel, p.port, msg)
-				time.Sleep(readWait)
-			}
-			plugCount = 0
-		}
+		// if plugCount == 8 {
+		// 	for _, twc := range p.knownTWCs {
+		// 		if p.DebugLevel >= 15 {
+		// 			log.Println(log2JSONString(LogData{
+		// 				Type:     "INFO",
+		// 				Source:   "polling",
+		// 				Sender:   fmt.Sprintf("%x", p.ID),
+		// 				Receiver: fmt.Sprintf("%x", twc.TWCID),
+		// 				Message:  "Poll Secondary for plug state",
+		// 			}))
+		// 		}
+		// 		msg := append(append([]byte{0xFB, 0xB4}, p.ID...), twc.TWCID...)
+		// 		padBytes(&msg)
+		// 		_, _ = SendMessage(p.DebugLevel, p.port, msg)
+		// 		time.Sleep(readWait)
+		// 		p.ReadMessage()
+		// 	}
+		// 	plugCount = 0
+		// }
 		if kwhCount == 10 {
 			for _, twc := range p.knownTWCs {
 				if p.DebugLevel >= 15 {
@@ -467,6 +472,7 @@ func (p *TWCPrimary) Run() {
 				padBytes(&msg)
 				_, _ = SendMessage(p.DebugLevel, p.port, msg)
 				time.Sleep(readWait)
+				p.ReadMessage()
 			}
 			kwhCount = 0
 		}
@@ -486,136 +492,131 @@ func (p *TWCPrimary) ReadMessage() {
 	var msgRxCount = 0
 	var msg []byte
 	var msgLen int
-
-	readWait := 100 * time.Millisecond
 	// get the message
 	for {
-		for {
-			// this section is where we read in the bytes that may be on the serial line until we have our data
-			var dataLen int
-			var data []byte
-			dataLen = 1
-			buf := make([]byte, dataLen)
-			n, _ := p.port.Read(buf[:])
-			data = buf[:n]
-			if len(data) == 0 {
-				break
-			}
-			if msgLen == 0 && data[0] != 0xC0 {
-				if p.DebugLevel >= 12 {
-					log.Println(log2JSONString(LogData{
-						Type:    "INFO",
-						Source:  "primary",
-						Sender:  fmt.Sprintf("%x", p.ID),
-						Message: "Ignoring data if length is 0 or first byte is not C0",
-					}))
-				}
-				ignoredData = append(ignoredData, data...)
-			} else if msgLen > 0 && msgLen < 15 && data[0] == 0xC0 {
-				if p.DebugLevel >= 12 {
-					log.Println(log2JSONString(LogData{
-						Type:    "INFO",
-						Source:  "primary",
-						Sender:  fmt.Sprintf("%x", p.ID),
-						Message: "Found end of message before full message received",
-					}))
-					// found end of message before full message received
-				}
-				msg = data
-				msgLen = 1
-			}
-			if msgLen == 0 {
-				msg = []byte{}
-			}
-			msg = append(msg, data...)
-			msgLen++
-			if msgLen >= 16 && data[0] == 0xC0 {
-				break
-			}
+		// this section is where we read in the bytes that may be on the serial line until we have our data
+		var dataLen int
+		var data []byte
+		dataLen = 1
+		buf := make([]byte, dataLen)
+		n, _ := p.port.Read(buf[:])
+		data = buf[:n]
+		if len(data) == 0 {
+			break
 		}
+		if msgLen == 0 && data[0] != 0xC0 {
+			if p.DebugLevel >= 12 {
+				log.Println(log2JSONString(LogData{
+					Type:    "INFO",
+					Source:  "primary",
+					Sender:  fmt.Sprintf("%x", p.ID),
+					Message: "Ignoring data if length is 0 or first byte is not C0",
+				}))
+			}
+			ignoredData = append(ignoredData, data...)
+		} else if msgLen > 0 && msgLen < 15 && data[0] == 0xC0 {
+			if p.DebugLevel >= 12 {
+				log.Println(log2JSONString(LogData{
+					Type:    "INFO",
+					Source:  "primary",
+					Sender:  fmt.Sprintf("%x", p.ID),
+					Message: "Found end of message before full message received",
+				}))
+				// found end of message before full message received
+			}
+			msg = data
+			msgLen = 1
+		}
+		if msgLen == 0 {
+			msg = []byte{}
+		}
+		msg = append(msg, data...)
+		msgLen++
+		if msgLen >= 16 && data[0] == 0xC0 {
+			break
+		}
+	}
 
-		if msgLen >= 16 {
-			msg = unescapeMessage(msg, msgLen)
-			msgLen = 0
-			msgRxCount++
-			if bytes.Compare(lastTWCResponseMsg, []byte{}) == 0 &&
-				bytes.Compare(msg[0:2], []byte{0xFB, 0xE0}) == 0 && bytes.Compare(msg[0:2], []byte{0xFD, 0xE0}) == 0 &&
-				bytes.Compare(msg[0:2], []byte{0xFC, 0xE1}) == 0 && bytes.Compare(msg[0:2], []byte{0xFB, 0xE2}) == 0 &&
-				bytes.Compare(msg[0:2], []byte{0xFD, 0xE2}) == 0 && bytes.Compare(msg[0:2], []byte{0xFB, 0xEB}) == 0 &&
-				bytes.Compare(msg[0:2], []byte{0xFD, 0xEB}) == 0 && bytes.Compare(msg[0:2], []byte{0xFD, 0xE0}) == 0 {
-				lastTWCResponseMsg = msg
-			}
-			var debugBytes []byte
-			for _, dByte := range msg {
-				debugByte := []byte(fmt.Sprintf("%0X ", dByte))
-				debugBytes = append(debugBytes, debugByte...)
-			}
-			if p.DebugLevel >= 1 {
-				if p.DebugLevel > 1 {
-					log.Println(log2JSONString(LogData{
-						Type:    "DEBUG",
-						Source:  "primary",
-						Message: fmt.Sprintf("Rx@: (%0X) %s", ignoredData, debugBytes),
-					}))
-				} else {
-					log.Println(log2JSONString(LogData{
-						Type:    "DEBUG",
-						Source:  "primary",
-						Message: fmt.Sprintf("Rx@: %s", debugBytes),
-					}))
-				}
-			}
-			ignoredData = []byte{}
-			if len(msg) != 14 && len(msg) != 16 && len(msg) != 20 {
-				// ignoring message of unexpected length
-				var debugBytes []byte
-				for _, debugB := range msg {
-					debubByte := []byte(fmt.Sprintf("%X ", debugB))
-					debugBytes = append(debugBytes, debubByte...)
-				}
-				if p.DebugLevel >= 2 {
-					log.Println(log2JSONString(LogData{
-						Type:    "DEBUG",
-						Source:  "primary",
-						Sender:  fmt.Sprintf("%x", p.ID),
-						Message: fmt.Sprintf("Ignoring message of unexpected length, msg: %s", debugBytes),
-					}))
-				}
-				return
-			}
-			checksumExpected := msg[len(msg)-1]
-			checksum := 0
-			for b := 1; b < len(msg)-1; b++ {
-				checksum = checksum + int(msg[b])
-			}
-			if byte(checksum&0xFF) != checksumExpected {
-				// checksum does not match
-				var debugBytes []byte
-				for _, debugB := range msg {
-					debubByte := []byte(fmt.Sprintf("%X ", debugB))
-					debugBytes = append(debugBytes, debubByte...)
-				}
-				if p.DebugLevel >= 2 {
-					log.Println(log2JSONString(LogData{
-						Type:    "DEBUG",
-						Source:  "primary",
-						Sender:  fmt.Sprintf("%x", p.ID),
-						Message: fmt.Sprintf("Checksum does not match %x %x expected: %x; msg: %s", checksum&0xFF, byte(checksum&0xFF), checksumExpected, debugBytes),
-					}))
-				}
-				return
-			}
-			foundMsgMatch := false
-			p.isSecondaryReadyToLink(msg, &foundMsgMatch)
-			p.receiveSecondaryHeartbeatData(msg, &foundMsgMatch)
-			p.receivePeriodicPollData(msg, &foundMsgMatch)
-			p.receiveVinStart(msg, &foundMsgMatch)
-			p.receiveVinMiddle(msg, &foundMsgMatch)
-			p.receiveVinEnd(msg, &foundMsgMatch)
-			p.receivePlugState(msg, &foundMsgMatch)
-			p.isPrimaryTWC(msg, &foundMsgMatch)
+	if msgLen >= 16 {
+		msg = unescapeMessage(msg, msgLen)
+		msgLen = 0
+		msgRxCount++
+		if bytes.Compare(lastTWCResponseMsg, []byte{}) == 0 &&
+			bytes.Compare(msg[0:2], []byte{0xFB, 0xE0}) == 0 && bytes.Compare(msg[0:2], []byte{0xFD, 0xE0}) == 0 &&
+			bytes.Compare(msg[0:2], []byte{0xFC, 0xE1}) == 0 && bytes.Compare(msg[0:2], []byte{0xFB, 0xE2}) == 0 &&
+			bytes.Compare(msg[0:2], []byte{0xFD, 0xE2}) == 0 && bytes.Compare(msg[0:2], []byte{0xFB, 0xEB}) == 0 &&
+			bytes.Compare(msg[0:2], []byte{0xFD, 0xEB}) == 0 && bytes.Compare(msg[0:2], []byte{0xFD, 0xE0}) == 0 {
+			lastTWCResponseMsg = msg
 		}
-		time.Sleep(readWait)
+		var debugBytes []byte
+		for _, dByte := range msg {
+			debugByte := []byte(fmt.Sprintf("%0X ", dByte))
+			debugBytes = append(debugBytes, debugByte...)
+		}
+		if p.DebugLevel >= 1 {
+			if p.DebugLevel > 1 {
+				log.Println(log2JSONString(LogData{
+					Type:    "DEBUG",
+					Source:  "primary",
+					Message: fmt.Sprintf("Rx@: (%0X) %s", ignoredData, debugBytes),
+				}))
+			} else {
+				log.Println(log2JSONString(LogData{
+					Type:    "DEBUG",
+					Source:  "primary",
+					Message: fmt.Sprintf("Rx@: %s", debugBytes),
+				}))
+			}
+		}
+		ignoredData = []byte{}
+		if len(msg) != 14 && len(msg) != 16 && len(msg) != 20 {
+			// ignoring message of unexpected length
+			var debugBytes []byte
+			for _, debugB := range msg {
+				debubByte := []byte(fmt.Sprintf("%X ", debugB))
+				debugBytes = append(debugBytes, debubByte...)
+			}
+			if p.DebugLevel >= 2 {
+				log.Println(log2JSONString(LogData{
+					Type:    "DEBUG",
+					Source:  "primary",
+					Sender:  fmt.Sprintf("%x", p.ID),
+					Message: fmt.Sprintf("Ignoring message of unexpected length, msg: %s", debugBytes),
+				}))
+			}
+			return
+		}
+		checksumExpected := msg[len(msg)-1]
+		checksum := 0
+		for b := 1; b < len(msg)-1; b++ {
+			checksum = checksum + int(msg[b])
+		}
+		if byte(checksum&0xFF) != checksumExpected {
+			// checksum does not match
+			var debugBytes []byte
+			for _, debugB := range msg {
+				debubByte := []byte(fmt.Sprintf("%X ", debugB))
+				debugBytes = append(debugBytes, debubByte...)
+			}
+			if p.DebugLevel >= 2 {
+				log.Println(log2JSONString(LogData{
+					Type:    "DEBUG",
+					Source:  "primary",
+					Sender:  fmt.Sprintf("%x", p.ID),
+					Message: fmt.Sprintf("Checksum does not match %x %x expected: %x; msg: %s", checksum&0xFF, byte(checksum&0xFF), checksumExpected, debugBytes),
+				}))
+			}
+			return
+		}
+		foundMsgMatch := false
+		p.isSecondaryReadyToLink(msg, &foundMsgMatch)
+		p.receiveSecondaryHeartbeatData(msg, &foundMsgMatch)
+		p.receivePeriodicPollData(msg, &foundMsgMatch)
+		p.receiveVinStart(msg, &foundMsgMatch)
+		p.receiveVinMiddle(msg, &foundMsgMatch)
+		p.receiveVinEnd(msg, &foundMsgMatch)
+		p.receivePlugState(msg, &foundMsgMatch)
+		p.isPrimaryTWC(msg, &foundMsgMatch)
 	}
 }
 
