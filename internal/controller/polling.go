@@ -23,7 +23,7 @@ func (p *TWCPrimary) PollSecondaryKWH() (int64, error) {
 		padBytes(&msg)
 		_, _ = SendMessage(p.DebugLevel, p.port, msg)
 		// p.ReadMessage()
-		// time.Sleep(250 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 	return time.Now().UTC().Unix(), nil
 }
@@ -103,7 +103,7 @@ func (p *TWCPrimary) PollVINStart() (int64, error) {
 			padBytes(&msg)
 			_, _ = SendMessage(p.DebugLevel, p.port, msg)
 			// p.ReadMessage()
-			// time.Sleep(250 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 	return time.Now().UTC().Unix(), nil
@@ -127,7 +127,7 @@ func (p *TWCPrimary) PollVINMiddle() (int64, error) {
 			padBytes(&msg)
 			_, _ = SendMessage(p.DebugLevel, p.port, msg)
 			// p.ReadMessage()
-			// time.Sleep(250 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 	return time.Now().UTC().Unix(), nil
@@ -151,7 +151,7 @@ func (p *TWCPrimary) PollVINEnd() (int64, error) {
 			padBytes(&msg)
 			_, _ = SendMessage(p.DebugLevel, p.port, msg)
 			// p.ReadMessage()
-			// time.Sleep(250 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 	return time.Now().UTC().Unix(), nil
@@ -175,7 +175,7 @@ func (p *TWCPrimary) PollPlugState() (int64, error) {
 			padBytes(&msg)
 			_, _ = SendMessage(p.DebugLevel, p.port, msg)
 			// p.ReadMessage()
-			// time.Sleep(250 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 	return time.Now().UTC().Unix(), nil
