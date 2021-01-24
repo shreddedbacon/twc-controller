@@ -570,6 +570,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 		}
 		time.Sleep(50 * time.Millisecond)
 		if msgLen == 0 {
+			fmt.Println(msgCount)
 			switch msgCount {
 			case 1:
 				p.PollVINStart()
