@@ -578,29 +578,34 @@ func (p *TWCPrimary) ReadMessageV2() {
 		time.Sleep(50 * time.Millisecond)
 		if msgSent == false {
 			if msgLen == 0 {
-				log.Println("sending", msgCount)
 				switch msgCount {
 				case 1:
+					log.Println("sending", msgCount)
 					p.PollVINStart()
 					msgSent = true
 					msgCount++
 				case 3:
+					log.Println("sending", msgCount)
 					p.PollVINMiddle()
 					msgSent = true
 					msgCount++
 				case 5:
+					log.Println("sending", msgCount)
 					p.PollVINEnd()
 					msgSent = true
 					msgCount++
 				case 7:
+					log.Println("sending", msgCount)
 					p.PollSecondaryKWH()
 					msgSent = true
 					msgCount++
 				case 9:
+					log.Println("sending", msgCount)
 					p.PollPlugState()
 					msgSent = true
 					msgCount++
 				case 0, 2, 4, 6, 8:
+					log.Println("sending", msgCount)
 					// every other message will be a heartbeat
 					// do heartbeat here
 
