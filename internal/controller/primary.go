@@ -539,7 +539,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 			// the starting byte
 			msg = append(msg, buf[0])
 			msgLen++
-		} else if buf[0] == 0xC0 && msgLen > 2 {
+		} else if buf[0] == 0xC0 && msgLen > 0 {
 			// the final byte is discovered
 			msg = append(msg, buf[0])
 
