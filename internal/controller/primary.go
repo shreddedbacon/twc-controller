@@ -521,7 +521,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 		if err != nil {
 			numErrs++
 			fmt.Println("read err")
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		} else {
 			// if we don't get any errors before we hit 10 errors, reset the counter
 			numErrs = 0
@@ -570,7 +570,6 @@ func (p *TWCPrimary) ReadMessageV2() {
 		}
 		time.Sleep(50 * time.Millisecond)
 		if msgLen == 0 {
-			fmt.Println(msgCount)
 			switch msgCount {
 			case 1:
 				p.PollVINStart()
