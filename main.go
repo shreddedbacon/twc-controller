@@ -40,7 +40,7 @@ func main() {
 	serialConfig := &serial.Config{
 		Name:        twcConfig.SerialConfig.DevicePath,
 		Baud:        twcConfig.SerialConfig.BaudRate,
-		ReadTimeout: 1000 * time.Millisecond,
+		ReadTimeout: 100 * time.Millisecond,
 		// Size:        8,
 	}
 	twcConfig.ConfigPath = configPath

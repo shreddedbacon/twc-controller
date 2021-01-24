@@ -521,17 +521,17 @@ func (p *TWCPrimary) ReadMessageV2() {
 		_, err := p.port.Read(buf[:])
 		if err != nil {
 			numErrs++
-			fmt.Println("read err")
+			log.Println("read err")
 			time.Sleep(50 * time.Millisecond)
 		} else {
 			// if we don't get any errors before we hit 10 errors, reset the counter
 			numErrs = 0
 		}
-		if numErrs == 10 {
+		if numErrs == 30 {
 			// if we get 10 errors in a row, pause for 10 seconds to see if it can recover
 			numErrs = 0
 			p.port.Flush()
-			fmt.Println("sleep")
+			log.Println("sleep")
 			time.Sleep(10000 * time.Millisecond)
 			continue
 		}
@@ -639,7 +639,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 					msgCount = 0
 				}
 			}
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			// do any heartbeat related things here, or do the message polling here
 		}
 	}
