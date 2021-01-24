@@ -9,7 +9,7 @@ import (
 // PollSecondaryKWH polls the secondary TWCs for their usage statistics
 func (p *TWCPrimary) PollSecondaryKWH() (int64, error) {
 	for _, twc := range p.knownTWCs {
-		if p.DebugLevel >= 15 {
+		if p.DebugLevel >= 1 {
 			log.Println(log2JSONString(LogData{
 				Type:     "INFO",
 				Source:   "polling",
