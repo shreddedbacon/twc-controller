@@ -578,7 +578,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 		time.Sleep(50 * time.Millisecond)
 		if msgSent == false {
 			if msgLen == 0 {
-				log.Println("sending")
+				log.Println("sending", msgCount)
 				switch msgCount {
 				case 1:
 					p.PollVINStart()
@@ -631,6 +631,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 										Message:  "Sending heartbeat to secondary TWC",
 									}))
 								}
+								log.Println("heartbeat", msgCount)
 								p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 								msgSent = true
 							}
