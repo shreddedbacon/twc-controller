@@ -8,6 +8,7 @@ import (
 
 // PollSecondaryKWH polls the secondary TWCs for their usage statistics
 func (p *TWCPrimary) PollSecondaryKWH() (int64, error) {
+	fmt.Println(p.knownTWCs)
 	for _, twc := range p.knownTWCs {
 		if p.DebugLevel >= 1 {
 			log.Println(log2JSONString(LogData{
