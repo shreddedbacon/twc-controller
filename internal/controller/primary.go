@@ -521,7 +521,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 		if err != nil {
 			numErrs++
 			fmt.Println("read err")
-			time.Sleep(1000 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 		} else {
 			// if we don't get any errors before we hit 10 errors, reset the counter
 			numErrs = 0
