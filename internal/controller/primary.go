@@ -512,6 +512,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 	msg := []byte{}
 	numErrs := 0
 	msgCount := 0
+	msgSent := false
 	for {
 		now := time.Now().UTC().Unix()
 
@@ -564,6 +565,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 			if p.numInitMsgsToSend == 10 {
 				break
 			}
+			msgSent = false
 
 			// once message is send, wait a short time before reading from serial again
 			time.Sleep(50 * time.Millisecond)
@@ -574,62 +576,70 @@ func (p *TWCPrimary) ReadMessageV2() {
 		}
 		time.Sleep(50 * time.Millisecond)
 		if msgLen == 0 {
-			switch msgCount {
-			case 1:
-				p.PollVINStart()
-				msgCount++
-			case 3:
-				p.PollVINMiddle()
-				msgCount++
-			case 5:
-				p.PollVINEnd()
-				msgCount++
-			case 7:
-				p.PollSecondaryKWH()
-				msgCount++
-			case 9:
-				p.PollPlugState()
-				msgCount++
-			case 0, 2, 4, 6, 8:
-				// every other message will be a heartbeat
-				// do heartbeat here
+			if msgSent == false {
+				switch msgCount {
+				case 1:
+					p.PollVINStart()
+					msgSent = true
+					msgCount++
+				case 3:
+					p.PollVINMiddle()
+					msgSent = true
+					msgCount++
+				case 5:
+					p.PollVINEnd()
+					msgSent = true
+					msgCount++
+				case 7:
+					p.PollSecondaryKWH()
+					msgSent = true
+					msgCount++
+				case 9:
+					p.PollPlugState()
+					msgSent = true
+					msgCount++
+				case 0, 2, 4, 6, 8:
+					// every other message will be a heartbeat
+					// do heartbeat here
 
-				// decision has been made to only ever support 1 TWC with this controller
-				// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
-				// to handle setting the logic
-				if (now - p.timeLastTx) > 0 {
-					if len(p.knownTWCs) == 1 {
-						secondaryTWC := p.knownTWCs[0]
-						if (now - secondaryTWC.TimeLastRx) >= 26 {
-							if p.DebugLevel >= 12 {
-								log.Println(log2JSONString(LogData{
-									Type:     "INFO",
-									Source:   "primary",
-									Sender:   fmt.Sprintf("%x", p.ID),
-									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-									Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
-								}))
+					// decision has been made to only ever support 1 TWC with this controller
+					// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
+					// to handle setting the logic
+					if (now - p.timeLastTx) > 0 {
+						if len(p.knownTWCs) == 1 {
+							secondaryTWC := p.knownTWCs[0]
+							if (now - secondaryTWC.TimeLastRx) >= 26 {
+								if p.DebugLevel >= 12 {
+									log.Println(log2JSONString(LogData{
+										Type:     "INFO",
+										Source:   "primary",
+										Sender:   fmt.Sprintf("%x", p.ID),
+										Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+										Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+									}))
+								}
+								p.RemoveSecondary(0)
+							} else {
+								if p.DebugLevel >= 12 {
+									log.Println(log2JSONString(LogData{
+										Type:     "INFO",
+										Source:   "primary",
+										Sender:   fmt.Sprintf("%x", p.ID),
+										Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+										Message:  "Sending heartbeat to secondary TWC",
+									}))
+								}
+								p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+								msgSent = true
 							}
-							p.RemoveSecondary(0)
-						} else {
-							if p.DebugLevel >= 12 {
-								log.Println(log2JSONString(LogData{
-									Type:     "INFO",
-									Source:   "primary",
-									Sender:   fmt.Sprintf("%x", p.ID),
-									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-									Message:  "Sending heartbeat to secondary TWC",
-								}))
-							}
-							p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 						}
 					}
+					msgCount++
+				case 10:
+					msgCount = 0
 				}
-				msgCount++
-			case 10:
-				msgCount = 0
 			}
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			// do any heartbeat related things here, or do the message polling here
 		}
 	}
