@@ -512,7 +512,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 	msg := []byte{}
 	numErrs := 0
 	msgCount := 0
-	msgSent := false
+	// msgSent := false
 	for {
 		now := time.Now().UTC().Unix()
 
@@ -566,7 +566,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 				log.Println("break")
 				break
 			}
-			msgSent = false
+			// msgSent = false
 
 			// once message is send, wait a short time before reading from serial again
 			// time.Sleep(50 * time.Millisecond)
@@ -582,23 +582,23 @@ func (p *TWCPrimary) ReadMessageV2() {
 			switch msgCount {
 			case 1:
 				p.PollVINStart()
-				msgSent = true
+				// msgSent = true
 				msgCount++
 			case 3:
 				p.PollVINMiddle()
-				msgSent = true
+				// msgSent = true
 				msgCount++
 			case 5:
 				p.PollVINEnd()
-				msgSent = true
+				// msgSent = true
 				msgCount++
 			case 7:
 				p.PollSecondaryKWH()
-				msgSent = true
+				// msgSent = true
 				msgCount++
 			case 9:
 				p.PollPlugState()
-				msgSent = true
+				// msgSent = true
 				msgCount++
 			case 0, 2, 4, 6, 8:
 				// every other message will be a heartbeat
@@ -632,7 +632,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 								}))
 							}
 							p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-							msgSent = true
+							// msgSent = true
 						}
 					}
 				}
