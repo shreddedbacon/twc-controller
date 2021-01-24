@@ -512,29 +512,29 @@ func (p *TWCPrimary) ReadMessageV2() {
 	msg := []byte{}
 	numErrs := 0
 	msgCount := 0
-	// msgSent := false
+	msgSent := false
 	for {
 		now := time.Now().UTC().Unix()
 
 		dataLen := 1
 		buf := make([]byte, dataLen)
-		n, err := p.port.Read(buf[:])
+		_, err := p.port.Read(buf[:])
 		if err != nil {
 			numErrs++
-			log.Println("read err", n, err)
-			time.Sleep(100 * time.Millisecond)
+			// log.Println("read err", n, err)
+			// time.Sleep(100 * time.Millisecond)
 		} else {
 			// if we don't get any errors before we hit 10 errors, reset the counter
 			numErrs = 0
 		}
-		if numErrs == 50 {
-			// if we get 10 errors in a row, pause for 10 seconds to see if it can recover
-			numErrs = 0
-			p.port.Flush()
-			log.Println("sleep")
-			time.Sleep(10000 * time.Millisecond)
-			continue
-		}
+		// if numErrs == 50 {
+		// 	// if we get 10 errors in a row, pause for 10 seconds to see if it can recover
+		// 	numErrs = 0
+		// 	p.port.Flush()
+		// 	log.Println("sleep")
+		// 	time.Sleep(10000 * time.Millisecond)
+		// 	continue
+		// }
 		if buf[0] == 0xC0 && msgLen == 0 {
 			// the starting byte
 			msg = append(msg, buf[0])
@@ -566,7 +566,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 				log.Println("break")
 				break
 			}
-			// msgSent = false
+			msgSent = false
 
 			// once message is send, wait a short time before reading from serial again
 			// time.Sleep(50 * time.Millisecond)
@@ -575,75 +575,75 @@ func (p *TWCPrimary) ReadMessageV2() {
 			msg = append(msg, buf[0])
 			msgLen++
 		}
-		// time.Sleep(50 * time.Millisecond)
-		// if msgSent == false {
-		if msgLen == 0 {
-			log.Println("sending")
-			switch msgCount {
-			case 1:
-				p.PollVINStart()
-				// msgSent = true
-				msgCount++
-			case 3:
-				p.PollVINMiddle()
-				// msgSent = true
-				msgCount++
-			case 5:
-				p.PollVINEnd()
-				// msgSent = true
-				msgCount++
-			case 7:
-				p.PollSecondaryKWH()
-				// msgSent = true
-				msgCount++
-			case 9:
-				p.PollPlugState()
-				// msgSent = true
-				msgCount++
-			case 0, 2, 4, 6, 8:
-				// every other message will be a heartbeat
-				// do heartbeat here
+		time.Sleep(50 * time.Millisecond)
+		if msgSent == false {
+			if msgLen == 0 {
+				log.Println("sending")
+				switch msgCount {
+				case 1:
+					p.PollVINStart()
+					msgSent = true
+					msgCount++
+				case 3:
+					p.PollVINMiddle()
+					msgSent = true
+					msgCount++
+				case 5:
+					p.PollVINEnd()
+					msgSent = true
+					msgCount++
+				case 7:
+					p.PollSecondaryKWH()
+					msgSent = true
+					msgCount++
+				case 9:
+					p.PollPlugState()
+					msgSent = true
+					msgCount++
+				case 0, 2, 4, 6, 8:
+					// every other message will be a heartbeat
+					// do heartbeat here
 
-				// decision has been made to only ever support 1 TWC with this controller
-				// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
-				// to handle setting the logic
-				if (now - p.timeLastTx) > 0 {
-					if len(p.knownTWCs) == 1 {
-						secondaryTWC := p.knownTWCs[0]
-						if (now - secondaryTWC.TimeLastRx) >= 26 {
-							if p.DebugLevel >= 12 {
-								log.Println(log2JSONString(LogData{
-									Type:     "INFO",
-									Source:   "primary",
-									Sender:   fmt.Sprintf("%x", p.ID),
-									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-									Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
-								}))
+					// decision has been made to only ever support 1 TWC with this controller
+					// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
+					// to handle setting the logic
+					if (now - p.timeLastTx) > 0 {
+						if len(p.knownTWCs) == 1 {
+							secondaryTWC := p.knownTWCs[0]
+							if (now - secondaryTWC.TimeLastRx) >= 26 {
+								if p.DebugLevel >= 12 {
+									log.Println(log2JSONString(LogData{
+										Type:     "INFO",
+										Source:   "primary",
+										Sender:   fmt.Sprintf("%x", p.ID),
+										Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+										Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+									}))
+								}
+								p.RemoveSecondary(0)
+							} else {
+								if p.DebugLevel >= 12 {
+									log.Println(log2JSONString(LogData{
+										Type:     "INFO",
+										Source:   "primary",
+										Sender:   fmt.Sprintf("%x", p.ID),
+										Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+										Message:  "Sending heartbeat to secondary TWC",
+									}))
+								}
+								p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+								msgSent = true
 							}
-							p.RemoveSecondary(0)
-						} else {
-							if p.DebugLevel >= 12 {
-								log.Println(log2JSONString(LogData{
-									Type:     "INFO",
-									Source:   "primary",
-									Sender:   fmt.Sprintf("%x", p.ID),
-									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-									Message:  "Sending heartbeat to secondary TWC",
-								}))
-							}
-							p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
-							// msgSent = true
 						}
 					}
+					msgCount++
+				case 10:
+					msgCount = 0
 				}
-				msgCount++
-			case 10:
-				msgCount = 0
 			}
+			time.Sleep(50 * time.Millisecond)
+			// do any heartbeat related things here, or do the message polling here
 		}
-		time.Sleep(50 * time.Millisecond)
-		// do any heartbeat related things here, or do the message polling here
-		// }
 	}
 }
 
