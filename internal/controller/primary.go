@@ -627,7 +627,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 				msgCount = 0
 				break
 			}
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(250 * time.Millisecond)
 			// do any heartbeat related things here, or do the message polling here
 		}
 	}
