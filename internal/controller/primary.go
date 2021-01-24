@@ -538,12 +538,12 @@ func (p *TWCPrimary) ReadMessageV2() {
 			// the starting byte
 			msg = append(msg, buf[0])
 			msgLen++
-		} else if buf[0] == 0xC0 && msgLen > 0 {
+		} else if buf[0] == 0xC0 && msgLen > 2 {
 			// the final byte is discovered
 			msg = append(msg, buf[0])
 
 			// debugging
-			log.Println("Message  :", fmt.Sprintf("%X", msg), "Value:", fmt.Sprintf("%d", msg[1]), "Length:", msgLen)
+			log.Println("Message  :", fmt.Sprintf("%X", msg), "Length:", msgLen)
 
 			// do something with the message
 			foundMsgMatch := false
