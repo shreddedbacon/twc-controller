@@ -561,6 +561,10 @@ func (p *TWCPrimary) ReadMessageV2() {
 			msg = []byte{}
 			msgLen = 0
 
+			if p.numInitMsgsToSend == 10 {
+				break
+			}
+
 			// once message is send, wait a short time before reading from serial again
 			time.Sleep(50 * time.Millisecond)
 		} else if msgLen > 0 {
@@ -624,7 +628,6 @@ func (p *TWCPrimary) ReadMessageV2() {
 				msgCount++
 			case 10:
 				msgCount = 0
-				break
 			}
 			time.Sleep(250 * time.Millisecond)
 			// do any heartbeat related things here, or do the message polling here
