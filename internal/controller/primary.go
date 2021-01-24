@@ -593,30 +593,32 @@ func (p *TWCPrimary) ReadMessageV2() {
 				// decision has been made to only ever support 1 TWC with this controller
 				// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
 				// to handle setting the logic
-				if len(p.knownTWCs) == 1 {
-					secondaryTWC := p.knownTWCs[0]
-					if (now - secondaryTWC.TimeLastRx) >= 26 {
-						if p.DebugLevel >= 12 {
-							log.Println(log2JSONString(LogData{
-								Type:     "INFO",
-								Source:   "primary",
-								Sender:   fmt.Sprintf("%x", p.ID),
-								Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-								Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
-							}))
+				if (now - p.timeLastTx) > 0 {
+					if len(p.knownTWCs) == 1 {
+						secondaryTWC := p.knownTWCs[0]
+						if (now - secondaryTWC.TimeLastRx) >= 26 {
+							if p.DebugLevel >= 12 {
+								log.Println(log2JSONString(LogData{
+									Type:     "INFO",
+									Source:   "primary",
+									Sender:   fmt.Sprintf("%x", p.ID),
+									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+									Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+								}))
+							}
+							p.RemoveSecondary(0)
+						} else {
+							if p.DebugLevel >= 12 {
+								log.Println(log2JSONString(LogData{
+									Type:     "INFO",
+									Source:   "primary",
+									Sender:   fmt.Sprintf("%x", p.ID),
+									Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+									Message:  "Sending heartbeat to secondary TWC",
+								}))
+							}
+							p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 						}
-						p.RemoveSecondary(0)
-					} else {
-						if p.DebugLevel >= 12 {
-							log.Println(log2JSONString(LogData{
-								Type:     "INFO",
-								Source:   "primary",
-								Sender:   fmt.Sprintf("%x", p.ID),
-								Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-								Message:  "Sending heartbeat to secondary TWC",
-							}))
-						}
-						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 					}
 				}
 				msgCount++
@@ -624,7 +626,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 				msgCount = 0
 				break
 			}
-			time.Sleep(50 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			// do any heartbeat related things here, or do the message polling here
 		}
 	}
