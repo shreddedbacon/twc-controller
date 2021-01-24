@@ -489,8 +489,6 @@ func (p *TWCPrimary) Run() {
 func (p *TWCPrimary) RunV2() {
 	for {
 		time.Sleep(25 * time.Millisecond)
-		now := time.Now().UTC().Unix()
-
 		if p.numInitMsgsToSend > 5 {
 			p.timeLastTx, _ = p.sendPrimaryLinkReady1()
 			time.Sleep(100 * time.Millisecond)
@@ -502,52 +500,21 @@ func (p *TWCPrimary) RunV2() {
 			p.numInitMsgsToSend = p.numInitMsgsToSend - 1
 			continue
 		}
-
-		// After finishing the 5 startup linkready1 and linkready2
-		if (now - p.timeLastTx) > 0 {
-			// decision has been made to only ever support 1 TWC with this controller
-			// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
-			// to handle setting the logic
-			if len(p.knownTWCs) == 1 {
-				secondaryTWC := p.knownTWCs[0]
-				if (now - secondaryTWC.TimeLastRx) >= 26 {
-					if p.DebugLevel >= 12 {
-						log.Println(log2JSONString(LogData{
-							Type:     "INFO",
-							Source:   "primary",
-							Sender:   fmt.Sprintf("%x", p.ID),
-							Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-							Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
-						}))
-					}
-					p.RemoveSecondary(0)
-				} else {
-					if p.DebugLevel >= 12 {
-						log.Println(log2JSONString(LogData{
-							Type:     "INFO",
-							Source:   "primary",
-							Sender:   fmt.Sprintf("%x", p.ID),
-							Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
-							Message:  "Sending heartbeat to secondary TWC",
-						}))
-					}
-					p.ReadMessageV2(secondaryTWC)
-				}
-			}
-		}
-
+		p.ReadMessageV2()
 		// do new messaging here
 	}
 
 }
 
 // ReadMessageV2 handle reading messages the new way
-func (p *TWCPrimary) ReadMessageV2(secondaryTWC *TWCSecondary) {
+func (p *TWCPrimary) ReadMessageV2() {
 	msgLen := 0
 	msg := []byte{}
 	numErrs := 0
 	msgCount := 0
 	for {
+		now := time.Now().UTC().Unix()
+
 		dataLen := 1
 		buf := make([]byte, dataLen)
 		_, err := p.port.Read(buf[:])
@@ -622,7 +589,36 @@ func (p *TWCPrimary) ReadMessageV2(secondaryTWC *TWCSecondary) {
 			case 0, 2, 4, 6, 8:
 				// every other message will be a heartbeat
 				// do heartbeat here
-				p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+
+				// decision has been made to only ever support 1 TWC with this controller
+				// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
+				// to handle setting the logic
+				if len(p.knownTWCs) == 1 {
+					secondaryTWC := p.knownTWCs[0]
+					if (now - secondaryTWC.TimeLastRx) >= 26 {
+						if p.DebugLevel >= 12 {
+							log.Println(log2JSONString(LogData{
+								Type:     "INFO",
+								Source:   "primary",
+								Sender:   fmt.Sprintf("%x", p.ID),
+								Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+								Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+							}))
+						}
+						p.RemoveSecondary(0)
+					} else {
+						if p.DebugLevel >= 12 {
+							log.Println(log2JSONString(LogData{
+								Type:     "INFO",
+								Source:   "primary",
+								Sender:   fmt.Sprintf("%x", p.ID),
+								Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+								Message:  "Sending heartbeat to secondary TWC",
+							}))
+						}
+						p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+					}
+				}
 				msgCount++
 			case 10:
 				msgCount = 0
