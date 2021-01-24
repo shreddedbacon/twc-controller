@@ -64,7 +64,8 @@ func main() {
 	// pre start the controller
 	p.PreStart()
 	// then actually run it
-	go p.Run()
+	// go p.Run()
+	go p.RunV2()
 	// start the LED loop
 	go p.LEDLoop()
 

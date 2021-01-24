@@ -485,6 +485,155 @@ func (p *TWCPrimary) Run() {
 	}
 }
 
+// RunV2 new way to do message reading.
+func (p *TWCPrimary) RunV2() {
+	for {
+		time.Sleep(25 * time.Millisecond)
+		now := time.Now().UTC().Unix()
+
+		if p.numInitMsgsToSend > 5 {
+			p.timeLastTx, _ = p.sendPrimaryLinkReady1()
+			time.Sleep(100 * time.Millisecond)
+			p.numInitMsgsToSend--
+			continue
+		} else if p.numInitMsgsToSend > 0 {
+			p.timeLastTx, _ = p.sendPrimaryLinkReady2()
+			time.Sleep(100 * time.Millisecond)
+			p.numInitMsgsToSend = p.numInitMsgsToSend - 1
+			continue
+		}
+
+		// After finishing the 5 startup linkready1 and linkready2
+		if (now - p.timeLastTx) > 0 {
+			// decision has been made to only ever support 1 TWC with this controller
+			// if you want to run more than 1 TWC, use multiple raspberry pis and controllers and build your own logic
+			// to handle setting the logic
+			if len(p.knownTWCs) == 1 {
+				secondaryTWC := p.knownTWCs[0]
+				if (now - secondaryTWC.TimeLastRx) >= 26 {
+					if p.DebugLevel >= 12 {
+						log.Println(log2JSONString(LogData{
+							Type:     "INFO",
+							Source:   "primary",
+							Sender:   fmt.Sprintf("%x", p.ID),
+							Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+							Message:  "Have not heard from secondary TWC for 26 seconds, removing.",
+						}))
+					}
+					p.RemoveSecondary(0)
+				} else {
+					if p.DebugLevel >= 12 {
+						log.Println(log2JSONString(LogData{
+							Type:     "INFO",
+							Source:   "primary",
+							Sender:   fmt.Sprintf("%x", p.ID),
+							Receiver: fmt.Sprintf("%x", secondaryTWC.TWCID),
+							Message:  "Sending heartbeat to secondary TWC",
+						}))
+					}
+					p.ReadMessageV2(secondaryTWC)
+				}
+			}
+		}
+
+		// do new messaging here
+	}
+
+}
+
+// ReadMessageV2 handle reading messages the new way
+func (p *TWCPrimary) ReadMessageV2(secondaryTWC *TWCSecondary) {
+	msgLen := 0
+	msg := []byte{}
+	numErrs := 0
+	msgCount := 0
+	for {
+		dataLen := 1
+		buf := make([]byte, dataLen)
+		_, err := p.port.Read(buf[:])
+		if err != nil {
+			numErrs++
+			fmt.Println("read err")
+			time.Sleep(1000 * time.Millisecond)
+		} else {
+			// if we don't get any errors before we hit 10 errors, reset the counter
+			numErrs = 0
+		}
+		if numErrs == 10 {
+			// if we get 10 errors in a row, pause for 10 seconds to see if it can recover
+			numErrs = 0
+			p.port.Flush()
+			fmt.Println("sleep")
+			time.Sleep(10000 * time.Millisecond)
+			continue
+		}
+		if buf[0] == 0xC0 && msgLen == 0 {
+			// the starting byte
+			msg = append(msg, buf[0])
+			msgLen++
+		} else if buf[0] == 0xC0 && msgLen > 0 {
+			// the final byte is discovered
+			msg = append(msg, buf[0])
+
+			// debugging
+			log.Println("Message  :", fmt.Sprintf("%X", msg), "Value:", fmt.Sprintf("%d", msg[1]), "Length:", msgLen)
+
+			// do something with the message
+			foundMsgMatch := false
+			msg = unescapeMessage(msg, msgLen)
+			p.isSecondaryReadyToLink(msg, &foundMsgMatch)
+			p.receiveSecondaryHeartbeatData(msg, &foundMsgMatch)
+			p.receivePeriodicPollData(msg, &foundMsgMatch)
+			p.receiveVinStart(msg, &foundMsgMatch)
+			p.receiveVinMiddle(msg, &foundMsgMatch)
+			p.receiveVinEnd(msg, &foundMsgMatch)
+			p.receivePlugState(msg, &foundMsgMatch)
+			p.isPrimaryTWC(msg, &foundMsgMatch)
+
+			// reset the len and bytes
+			msg = []byte{}
+			msgLen = 0
+
+			// once message is send, wait a short time before reading from serial again
+			time.Sleep(50 * time.Millisecond)
+		} else if msgLen > 0 {
+			// the middle byte(s)
+			msg = append(msg, buf[0])
+			msgLen++
+		}
+		time.Sleep(50 * time.Millisecond)
+		if msgLen == 0 {
+			switch msgCount {
+			case 1:
+				p.PollVINStart()
+				msgCount++
+			case 3:
+				p.PollVINMiddle()
+				msgCount++
+			case 5:
+				p.PollVINEnd()
+				msgCount++
+			case 7:
+				p.PollSecondaryKWH()
+				msgCount++
+			case 9:
+				p.PollPlugState()
+				msgCount++
+			case 0, 2, 4, 6, 8:
+				// every other message will be a heartbeat
+				// do heartbeat here
+				p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+				msgCount++
+			case 10:
+				msgCount = 0
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+			// do any heartbeat related things here, or do the message polling here
+		}
+	}
+}
+
 // ReadMessage reads message from serial port
 func (p *TWCPrimary) ReadMessage() {
 	var ignoredData []byte
@@ -672,7 +821,11 @@ func (p *TWCPrimary) SetMaxAmpsHandler(intAmps int) error {
 		return err
 	}
 	if p.knownTWCs != nil {
-		splitAmps := totalAmps / len(p.knownTWCs)
+		// if total amps is greater than 0 then divide it by the number of known twcs to split across each one
+		splitAmps := 0
+		if totalAmps > 0 {
+			splitAmps = totalAmps / len(p.knownTWCs)
+		}
 		for _, twc := range p.knownTWCs {
 			// set the twc to have the number of amps available to it to use in the heartbeat
 			twc.AvailableAmps = Dec2Bytes(uint16(splitAmps))
