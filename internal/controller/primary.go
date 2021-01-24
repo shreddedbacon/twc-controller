@@ -563,6 +563,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 			msgLen = 0
 
 			if p.numInitMsgsToSend == 10 {
+				log.Println("break")
 				break
 			}
 			msgSent = false
@@ -577,6 +578,7 @@ func (p *TWCPrimary) ReadMessageV2() {
 		time.Sleep(50 * time.Millisecond)
 		if msgLen == 0 {
 			if msgSent == false {
+				log.Println("sending")
 				switch msgCount {
 				case 1:
 					p.PollVINStart()
