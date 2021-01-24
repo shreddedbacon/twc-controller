@@ -92,7 +92,7 @@ func (p *TWCPrimary) isSecondaryReadyToLink(msg []byte, foundMsgMatch *bool) {
 			secondaryTWC.ReportedAmpsActual = []byte{0x00, 0x00}
 			secondaryTWC.ReportedAmpsMax = []byte{0x00, 0x00}
 		}
-		p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
+		// p.timeLastTx, _ = secondaryTWC.sendPrimaryHeartbeat(p.port, p.ID)
 	}
 }
 
